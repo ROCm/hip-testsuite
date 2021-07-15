@@ -515,51 +515,6 @@ class Cuda_stream(Tester, PrepareTest):
                 test_data.test_result = TestResult.FAIL
 
 
-# Test openmp-helloworld/
-# class Openmp_helloworld(Tester, PrepareTest):
-    # def __init__(self):
-        # Tester.__init__(self)
-        # self.cwd = os.getcwd()
-        # PrepareTest.__init__(self, "openmp-helloworld/", self.cwd)
-
-    # def getTests(self) -> List[Test]:
-        # test = Test()
-        # test.test_name = self.__class__.__name__
-        # intro = MINIAPP()
-        # intro.add_matched_with_names()
-        # test.classifiers = [intro]
-        # test.tester = self
-        # return [test]
-
-    # def clean(self):
-        # PrepareTest.clean(self, "openmp-helloworld")
-
-    # def test(self, test_data: HIPTestData):
-        # print("=============== openmp-helloworld test ===============")
-        # # Set repo info
-        # isrepocfgvalid =  self.set_hipex_repoinfo(test_data)
-        # if not isrepocfgvalid:
-            # test_data.test_result = TestResult.ERROR
-            # return
-        # # Create the log directory
-        # resultLogDir = test_data.log_location
-        # testid = "openmp-helloworld"
-        # with open(resultLogDir + "/" + testid + ".log", 'w+') as testLogger:
-            # res = self.download_hipexample(testLogger)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-            # res = self.buildtest(testLogger, test_data.HIP_PLATFORM, testid)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-
-            # if True == self.runtest(testLogger, testid):
-                # test_data.test_result = TestResult.PASS
-            # else:
-                # test_data.test_result = TestResult.FAIL
-
-
 # Test rodinia_3.0/hip/bfs/
 class Bfs(Tester, PrepareTest):
     def __init__(self):
@@ -653,11 +608,13 @@ class Cfd(Tester, PrepareTest):
                 
 
 # Test rodinia_3.0/hip/dwt2d/
+# This test is skipped for nvidia
 class Dwt2d(Tester, PrepareTest):
     def __init__(self):
         Tester.__init__(self)
         self.cwd = os.getcwd()
         PrepareTest.__init__(self, "rodinia_3.0/hip/dwt2d/", self.cwd)
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -669,11 +626,15 @@ class Dwt2d(Tester, PrepareTest):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self, "rodinia_3.dwt2d")
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self, "rodinia_3.dwt2d")
 
     def test(self, test_data: HIPTestData):
         print("=============== rodinia_3.0/hip/dwt2d test start ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.set_hipex_repoinfo(test_data)
             if not isrepocfgvalid:
@@ -697,8 +658,7 @@ class Dwt2d(Tester, PrepareTest):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
+
 
 # Test rodinia_3.0/hip/gaussian/
 class Gaussian(Tester, PrepareTest):
@@ -1161,11 +1121,13 @@ class Nw(Tester, PrepareTest):
 
 
 # Test rodinia_3.0/hip/particlefilter/
+# This test is skipped for amd.
 class Particlefilter(Tester, PrepareTest):
     def __init__(self):
         Tester.__init__(self)
         self.cwd = os.getcwd()
         PrepareTest.__init__(self, "rodinia_3.0/hip/particlefilter/", self.cwd)
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -1177,11 +1139,15 @@ class Particlefilter(Tester, PrepareTest):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self, "rodinia_3.particlefilter")
+        if self.platform != HIP_PLATFORM.amd:
+            PrepareTest.clean(self, "rodinia_3.particlefilter")
 
     def test(self, test_data: HIPTestData):
         print("=============== rodinia_3.0/hip/particlefilter test start ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.set_hipex_repoinfo(test_data)
             if not isrepocfgvalid:
@@ -1205,8 +1171,6 @@ class Particlefilter(Tester, PrepareTest):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
 
 
 # Test rodinia_3.0/hip/pathfinder/
@@ -1347,58 +1311,14 @@ class Streamcluster(Tester, PrepareTest):
                 test_data.test_result = TestResult.FAIL
 
 
-# Test rodinia_3.0/hip/b+tree/
-# class Btree(Tester, PrepareTest):
-    # def __init__(self):
-        # Tester.__init__(self)
-        # self.cwd = os.getcwd()
-        # PrepareTest.__init__(self, "rodinia_3.0/hip/b+tree/", self.cwd)
-
-    # def getTests(self) -> List[Test]:
-        # test = Test()
-        # test.test_name = self.__class__.__name__
-        # intro = PERFORMANCE()
-        # intro.add_matched_with_names()
-        # test.classifiers = [intro]
-        # test.tester = self
-        # return [test]
-
-    # def clean(self):
-        # PrepareTest.clean(self, "rodinia_3.b+tree")
-
-    # def test(self, test_data: HIPTestData):
-        # print("=============== rodinia_3.0/hip/b+tree test start ===============")
-        # # Set repo info
-        # isrepocfgvalid =  self.set_hipex_repoinfo(test_data)
-        # if not isrepocfgvalid:
-            # test_data.test_result = TestResult.ERROR
-            # return
-        # # Create the log directory
-        # resultLogDir = test_data.log_location
-        # testid = "rodinia_3.b+tree"
-        # with open(resultLogDir + "/" + testid + ".log", 'w+') as testLogger:
-            # res = self.download_hipexample(testLogger)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-
-            # res = self.buildtest(testLogger, test_data.HIP_PLATFORM, testid)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-
-            # if True == self.runtest(testLogger, testid):
-                # test_data.test_result = TestResult.PASS
-            # else:
-                # test_data.test_result = TestResult.FAIL
-
-
 # Test rodinia_3.0/hip/backprop/
+# This test is skipped for amd
 class Backprop(Tester, PrepareTest):
     def __init__(self):
         Tester.__init__(self)
         self.cwd = os.getcwd()
         PrepareTest.__init__(self, "rodinia_3.0/hip/backprop/", self.cwd)
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -1410,11 +1330,15 @@ class Backprop(Tester, PrepareTest):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self, "rodinia_3.backprop")
+        if self.platform != HIP_PLATFORM.amd:
+            PrepareTest.clean(self, "rodinia_3.backprop")
 
     def test(self, test_data: HIPTestData):
         print("=============== rodinia_3.0/hip/backprop test start ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.set_hipex_repoinfo(test_data)
             if not isrepocfgvalid:
@@ -1438,8 +1362,7 @@ class Backprop(Tester, PrepareTest):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
+
 
 # Test HIP-Examples-Applications/BinomialOption/
 class BinomialOption(Tester, PrepareTest):
@@ -2039,58 +1962,14 @@ class GpuStreamDouble(Tester, PrepareTest):
                 test_data.test_result = TestResult.FAIL
 
 
-# Test GPU-STREAM Float
-# class GpuStreamFloat(Tester, PrepareTest):
-    # def __init__(self):
-        # Tester.__init__(self)
-        # self.cwd = os.getcwd()
-        # PrepareTest.__init__(self, "../GPU-STREAM/", self.cwd)
-
-    # def getTests(self) -> List[Test]:
-        # test = Test()
-        # test.test_name = self.__class__.__name__
-        # intro = PERFORMANCE()
-        # intro.add_matched_with_names()
-        # test.classifiers = [intro]
-        # test.tester = self
-        # return [test]
-
-    # def clean(self):
-        # PrepareTest.clean(self, "GPU-STREAM-FLOAT")
-
-    # def test(self, test_data: HIPTestData):
-        # print("=============== GPU-STREAM Float start ===============")
-        # # Set repo info
-        # isrepocfgvalid =  self.set_gpustr_repoinfo(test_data)
-        # if not isrepocfgvalid:
-            # test_data.test_result = TestResult.ERROR
-            # return
-        # # Create the log directory
-        # resultLogDir = test_data.log_location
-        # testid = "GPU-STREAM-FLOAT"
-        # with open(resultLogDir + "/" + testid + ".log", 'w+') as testLogger:
-            # res = self.download_gpustream(testLogger)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-
-            # res = self.buildtest(testLogger, test_data.HIP_PLATFORM, testid)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-
-            # if True == self.runtest(testLogger, testid):
-                # test_data.test_result = TestResult.PASS
-            # else:
-                # test_data.test_result = TestResult.FAIL
-
-
 # Test mixbench-hip-alt
+# This test is skipped for nvidia
 class MixBenchAlt(Tester, PrepareTest):
     def __init__(self):
         Tester.__init__(self)
         self.cwd = os.getcwd()
         PrepareTest.__init__(self, "../mixbench/mixbench-hip/", self.cwd)
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -2102,11 +1981,15 @@ class MixBenchAlt(Tester, PrepareTest):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self, "mixbench-hip-alt")
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self, "mixbench-hip-alt")
 
     def test(self, test_data: HIPTestData):
         print("=============== mixbench-hip-alt start ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.set_mixben_repoinfo(test_data)
             if not isrepocfgvalid:
@@ -2130,15 +2013,16 @@ class MixBenchAlt(Tester, PrepareTest):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
+
 
 # Test mixbench-hip-ro
+# This test is skipped for nvidia
 class MixBenchRO(Tester, PrepareTest):
     def __init__(self):
         Tester.__init__(self)
         self.cwd = os.getcwd()
         PrepareTest.__init__(self, "../mixbench/mixbench-hip/", self.cwd)
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -2150,11 +2034,15 @@ class MixBenchRO(Tester, PrepareTest):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self, "mixbench-hip-ro")
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self, "mixbench-hip-ro")
 
     def test(self, test_data: HIPTestData):
         print("=============== GPU-STREAM Float start ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.set_mixben_repoinfo(test_data)
             if not isrepocfgvalid:
@@ -2178,7 +2066,4 @@ class MixBenchRO(Tester, PrepareTest):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
-
 
