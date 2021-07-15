@@ -17,73 +17,40 @@ class BuildRunCommon():
 
     # Fetches all available dtests using ctest
     def get_all_ctest(self):
-        buildpath = self.hippath + "/build/";
         cmdexc = "cd " + self.hippath + "/build;"
-        cmdexc += "ctest -N --show-only=\"json-v1\";"
-        with open("ctest.json", "w+") as jsonlog:
-            execshellcmd_largedump(cmdexc, self.logfile, jsonlog, None)
+        cmdexc += "ctest -N;"
+        with open("ctest.txt", "w+") as ctestlog:
+            execshellcmd_largedump(cmdexc, self.logfile, ctestlog, None)
         testlist = []
-        with open("ctest.json", "r") as jsonlog:
-            json_string = jsonlog.read()
-            ctest_json = json.loads(json_string)
-            all_tests = ctest_json["tests"]
-            for test in all_tests:
-                dtest = ""
-                for param in test["command"]:
-                    dtest += param + " "
-                dtest = re.sub(buildpath, "", dtest)
-                dtest = re.sub("/", ".", dtest)
-                testlist.append(dtest)
-
-        os.remove("ctest.json")
+        with open("ctest.txt", "r") as ctestlog:
+            for test in ctestlog:
+                if re.search("Test *#\d*:", test) != None:
+                    dtest = re.sub("Test *#\d*: ", "", test)
+                    dtest = re.sub("/", ".", dtest)
+                    dtest = dtest.lstrip()
+                    dtest = dtest.rstrip()
+                    testlist.append(dtest)
+        os.remove("ctest.txt")
         return testlist
 
     # Parse the test result
     def parsetest(self, log):
         log.seek(0)
-        passed = 0
-        failed = 0
-        skipped = 0
-        for line in log:
-            if "PASSED" in line:
-                passed = passed + 1
-            elif "FAILED" in line:
-                failed = failed + 1
-            elif "SKIP" in line:
-                skipped = skipped + 1
-            else:
-                pass
+        text = log.read()
         status = None
-        if failed > 0:
-            status = "FAILED"
-        elif passed > 0:
+        if re.search("100% tests passed", text) != None:
             status = "PASSED"
-        elif skipped > 0:
-            status = "SKIP"
         else:
-            # No Passed, Failed or Skipped Found
-            # Result is indeterminate. Hence failing
-            # this test.
             status = "FAILED"
         return status
 
     # Execute the test case
     def runtest(self, log, testcase, envtoset):
-        status = True
-        testcase[0] = re.sub("\.", "/", testcase[0])
-        #Check if the test binary exists
-        if not os.path.isfile(os.path.join(\
-        self.hippath, "build", testcase[0])):
-            print(testcase[0] + "does not exist")
-            return "FAILED"
-
-        cmdtest = ""
-        for param in testcase:
-            cmdtest += param + " "
+        cmdtest = "ctest -R " + testcase
         print("Executing command = " + cmdtest)
         # run test
         cmd = "cd " + os.path.join(self.hippath, "build") + ";"
-        cmd += cmdtest
+        cmd += cmdtest + ";"
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmd, log, runlogdump, envtoset)
         status = self.parsetest(runlogdump)

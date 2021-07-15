@@ -236,6 +236,7 @@ class ModuleApiDefaultDriver(Tester, PrepareTest, LogParser):
 
 
 # Test samples/0_Intro/module_api/launchKernelHcc.hip.out
+# This test is skipped for NVIDIA
 class ModuleApiLaunchKernelHcc(Tester, PrepareTest, LogParser):
     def __init__(self):
         Tester.__init__(self)
@@ -243,6 +244,7 @@ class ModuleApiLaunchKernelHcc(Tester, PrepareTest, LogParser):
         PrepareTest.__init__(self, "samples/0_Intro/module_api/",
                              "launchKernelHcc.hip.out", self.cwd)
         LogParser.__init__(self, 1, "PASSED") # Number of expected PASSED
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -254,12 +256,16 @@ class ModuleApiLaunchKernelHcc(Tester, PrepareTest, LogParser):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self)
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self)
 
     def test(self, test_data: HIPTestData):
         print("=============== ModuleApiLaunchKernelHcc Test ===============")
         # Set repo info
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             isrepocfgvalid =  self.setrepoinfo(test_data)
             if not isrepocfgvalid:
                 test_data.test_result = TestResult.ERROR
@@ -280,8 +286,6 @@ class ModuleApiLaunchKernelHcc(Tester, PrepareTest, LogParser):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
 
 
 # Test samples/0_Intro/module_api/runKernel.hip.out
@@ -469,12 +473,14 @@ class MatrixTranspose(Tester, PrepareTest, LogParser):
 
 
 # Test samples/2_Cookbook/10_inline_asm
+# This test is skipped for NVIDIA
 class InlineAsm(Tester, PrepareTest, LogParser):
     def __init__(self):
         Tester.__init__(self)
         self.cwd = os.getcwd()
         PrepareTest.__init__(self, "samples/2_Cookbook/10_inline_asm/", "inline_asm", self.cwd)
         LogParser.__init__(self, 1, "PASSED") # Number of expected PASSED
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -486,12 +492,16 @@ class InlineAsm(Tester, PrepareTest, LogParser):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self)
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self)
 
     def test(self, test_data: HIPTestData):
         print("=============== InlineAsm Test ===============")
         # Set repo info
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             isrepocfgvalid =  self.setrepoinfo(test_data)
             if not isrepocfgvalid:
                 test_data.test_result = TestResult.ERROR
@@ -512,11 +522,10 @@ class InlineAsm(Tester, PrepareTest, LogParser):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
 
 
 # Test samples/2_Cookbook/16_assembly_to_executable
+# This test is skipped for nvidia
 class SquareAsm(Tester, PrepareTest, LogParser):
     def __init__(self):
         Tester.__init__(self)
@@ -524,6 +533,7 @@ class SquareAsm(Tester, PrepareTest, LogParser):
         PrepareTest.__init__(self, "samples/2_Cookbook/16_assembly_to_executable/",
                              "square_asm.out", self.cwd)
         LogParser.__init__(self, 1, "PASSED") # Number of expected PASSED
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -535,11 +545,15 @@ class SquareAsm(Tester, PrepareTest, LogParser):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self)
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self)
 
     def test(self, test_data: HIPTestData):
         print("=============== SquareAsm Test ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.setrepoinfo(test_data)
             if not isrepocfgvalid:
@@ -561,8 +575,6 @@ class SquareAsm(Tester, PrepareTest, LogParser):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
 
 
 # Test samples/2_Cookbook/11_texture_driver
@@ -656,51 +668,6 @@ class Unroll(Tester, PrepareTest, LogParser):
                 test_data.test_result = TestResult.FAIL
 
 
-# Test samples/2_Cookbook/14_gpu_arch
-# class GpuArch(Tester, PrepareTest, LogParser):
-    # def __init__(self):
-        # Tester.__init__(self)
-        # self.cwd = os.getcwd()
-        # PrepareTest.__init__(self, "samples/2_Cookbook/14_gpu_arch/", "gpuarch", self.cwd)
-        # LogParser.__init__(self, 1, "success") # Number of expected PASSED
-
-    # def getTests(self) -> List[Test]:
-        # test = Test()
-        # test.test_name = self.__class__.__name__
-        # cookbook = COOKBOOK()
-        # cookbook.add_matched_with_names()
-        # test.classifiers = [cookbook]
-        # test.tester = self
-        # return [test]
-
-    # def clean(self):
-        # PrepareTest.clean(self)
-
-    # def test(self, test_data: HIPTestData):
-        # print("=============== GpuArch Test ===============")
-        # # Set repo info
-        # isrepocfgvalid =  self.setrepoinfo(test_data)
-        # if not isrepocfgvalid:
-            # test_data.test_result = TestResult.ERROR
-            # return
-        # # Create the log directory
-        # resultLogDir = test_data.log_location
-        # with open(resultLogDir + '/GpuArch.log', 'w+') as testLogger:
-            # res = self.downloadtest(testLogger)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-            # res = self.buildtest(testLogger, test_data.HIP_PLATFORM)
-            # if not res:
-                # test_data.test_result = TestResult.FAIL
-                # return
-            # self.runtest(testLogger)
-            # if self.numOfExpPassed == self.parse_common(self.testExecOutput):
-                # test_data.test_result = TestResult.PASS
-            # else:
-                # test_data.test_result = TestResult.FAIL
-
-
 # Test samples/2_Cookbook/4_shfl
 class Shfl(Tester, PrepareTest, LogParser):
     def __init__(self):
@@ -792,6 +759,7 @@ class SharedMemory(Tester, PrepareTest, LogParser):
 
 
 # Test samples/2_Cookbook/17_llvm_ir_to_executable
+# This test is skipped for nvidia
 class Square_Ir(Tester, PrepareTest, LogParser):
     def __init__(self):
         Tester.__init__(self)
@@ -799,6 +767,7 @@ class Square_Ir(Tester, PrepareTest, LogParser):
         PrepareTest.__init__(self, "samples/2_Cookbook/17_llvm_ir_to_executable/",
                              "square_ir.out", self.cwd)
         LogParser.__init__(self, 1, "PASSED") # Number of expected PASSED
+        self.platform = None
 
     def getTests(self) -> List[Test]:
         test = Test()
@@ -810,11 +779,15 @@ class Square_Ir(Tester, PrepareTest, LogParser):
         return [test]
 
     def clean(self):
-        PrepareTest.clean(self)
+        if self.platform != HIP_PLATFORM.nvidia:
+            PrepareTest.clean(self)
 
     def test(self, test_data: HIPTestData):
         print("=============== Square_Ir Test ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.amd:
+        self.platform = test_data.HIP_PLATFORM
+        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
+            test_data.test_result = TestResult.SKIP
+        else:
             # Set repo info
             isrepocfgvalid =  self.setrepoinfo(test_data)
             if not isrepocfgvalid:
@@ -836,8 +809,7 @@ class Square_Ir(Tester, PrepareTest, LogParser):
                     test_data.test_result = TestResult.PASS
                 else:
                     test_data.test_result = TestResult.FAIL
-        else:
-            test_data.test_result = TestResult.SKIP
+
 
 # Test samples/2_Cookbook/5_2dshfl
 class Dshfl(Tester, PrepareTest, LogParser):

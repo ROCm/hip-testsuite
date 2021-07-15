@@ -113,12 +113,14 @@ class Hipconformance(Tester, PrepareTest):
             print("Rocm packages download failed!")
             return testlist
 
+        print("Building HIP package ...")
         # Build Rocclr and Hip
         self.buildresult = self.build_package(self.logfd, get_tests_data.HIP_PLATFORM)
         if not self.buildresult:
             print("Rocm packages build failed!")
             return testlist
 
+        print("Building HIP package completed")
         # Fetch all the ctests
         dtestnamelist = self.get_ctest_list()
 
@@ -147,7 +149,7 @@ class Hipconformance(Tester, PrepareTest):
             return
         # Build test
         print("Running test: " + test_data.test.test_name + "..........")
-        testcase = test_data.test.test_name.split()
+        testcase = test_data.test.test_name
         status = None
 
         with open(test_data.log_location + "/test.log", 'w+') as testLogger:
