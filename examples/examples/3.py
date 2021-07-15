@@ -18,14 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+from amd.TesterRepository import Tester
+from amd.Test import HIPTestData, TestResult, Test
 from amd.test_classifier import TestClassifier
 
-from typing import Union
+from typing import List, Union
 
 
-class APPLICATIONS(TestClassifier):
+class PlatformTest(Tester):
+    """
+    This is example for accessing hip platform to test with
+    """
     def __init__(self):
-        TestClassifier.__init__(self)
+        Tester.__init__(self)
 
-    def add_matched_with_names(self, matched_with_names: Union[None, dict] = None):
-        TestClassifier.add_matched_with_names(self, {"applications": matched_with_names})
+    def test(self, test_data: HIPTestData):
+        print(test_data.HIP_PLATFORM)
+        test_data.test_result = TestResult.PASS

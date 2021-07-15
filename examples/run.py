@@ -23,15 +23,17 @@ import os
 import argparse
 
 if __name__ == "__main__":
-    sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
+    sys.path.append(os.path.join(os.path.dirname(__file__), "..", "src"))
 
 
 from amd.TestersExecutor import TestersExecutor
+from amd.TesterRepository import TesterRepository
 from amd.list_tests import list_tests
 import cfg
+import examples
 
 
-def parse_args():
+def parse_args(tester_repository):
     parser = argparse.ArgumentParser()
     parser.add_argument('--platform', help="On which hip_platform to test? amd/nvidia/ default:amd")
     parser.add_argument('-t', '--tests', nargs='+',
@@ -47,11 +49,11 @@ def parse_args():
         cfg.HIP_PLATFORM = args.platform
 
     if args.list_tests:
-        list_tests(quick=False, cfg=cfg)
+        list_tests(quick=False, cfg=cfg, tester_repository=tester_repository)
         return False
 
     if args.list_tests_quick:
-        list_tests(quick=True, cfg=cfg)
+        list_tests(quick=True, cfg=cfg, tester_repository=tester_repository)
         return False
 
     if args.tests:
@@ -61,10 +63,15 @@ def parse_args():
 
 
 def main():
-    if parse_args():
-        tester_executor: TestersExecutor = TestersExecutor()
-        tester_executor.config = cfg
-        tester_executor.executeTests()
+    tester_repository = TesterRepository()
+    tester_repository.clearTesterFrom()
+    tester_repository.addTesterFrom(pkgs=[examples])
+    tester_repository.addAllTesters()
+    tester_executor: TestersExecutor = TestersExecutor()
+    tester_executor.config = cfg
+
+    if parse_args(tester_repository=tester_repository):
+        tester_executor.executeTests(tester_repository=tester_repository)
 
 
 if __name__ == "__main__":
