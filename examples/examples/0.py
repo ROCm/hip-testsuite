@@ -18,14 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from amd.test_classifier import TestClassifier
+from pathlib import Path
 
-from typing import Union
+from amd.TesterRepository import Tester
+from amd.Test import TestData, TestResult
 
 
-class APPLICATIONS(TestClassifier):
+class Test0(Tester):
+    """
+    Simple test case, 
+    Which tests whether rocm is installed
+    """
     def __init__(self):
-        TestClassifier.__init__(self)
+        Tester.__init__(self)
 
-    def add_matched_with_names(self, matched_with_names: Union[None, dict] = None):
-        TestClassifier.add_matched_with_names(self, {"applications": matched_with_names})
+    def test(self, test_data: TestData):
+        if Path("/opt/rocm").exists():
+            test_data.test_result = TestResult.PASS
+        else:
+            test_data.test_result = TestResult.FAIL
