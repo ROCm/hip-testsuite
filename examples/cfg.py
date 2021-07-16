@@ -53,6 +53,9 @@ link_libs = None
 # None/list of -L
 link_libs_path = None
 
+# User Input for example 4.py
+user_value = 5
+
 # None/(test_name/test_suite/regex OR list of test_names/test_suites/regex)
 # e.g.1 run_tests = ["bitextract", "matrixtranspose"]
 # e.g.2 run_tests = "hip_samples"

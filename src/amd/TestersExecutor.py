@@ -97,7 +97,7 @@ class TestersExecutor(ConfigProcessor):
                 test_data.config = config
                 test_data.loadConfig()
             test_data.test = test
-            test_data.log_location = os.path.join(timestamped_log_location, test.test_name.lower())
+            test_data.log_location = os.path.join(timestamped_log_location, test.test_name.lower() + ".log.d")
             os.makedirs(test_data.log_location, exist_ok=True)
 
             try:
@@ -108,7 +108,7 @@ class TestersExecutor(ConfigProcessor):
 
             tests_status[test] = test_data.test_result
             tests_logs[test] = test_data.log_location
-            tests_relative_logs[test] = os.path.join(relative_timestamped_log_location, test.test_name.lower())
+            tests_relative_logs[test] = os.path.join(relative_timestamped_log_location, test.test_name.lower() + ".log.d")
             print("Completed Test: {test_name} with result {result}".format(test_name=test.test_name.lower(), result=test_data.test_result.name))
 
         for test in tests:
@@ -136,6 +136,14 @@ class TestersExecutor(ConfigProcessor):
             rocm_agents: Union[None, List[str]] = get_rocm_agents()
         except Exception as error:
             rocm_agents = None
+        try:
+            cuda_gpus: Union[None, List[str]] = get_cuda_gpus()
+        except Exception as error:
+            cuda_gpus = None
+        try:
+            cuda_rt_version: str = get_cuda_rt_version()
+        except Exception as error:
+            cuda_rt_version = None
 
         passed_tests = get_passed_tests(tests_status=tests_status)
         failed_tests = get_failed_tests(tests_status=tests_status)
@@ -147,7 +155,7 @@ class TestersExecutor(ConfigProcessor):
         # ### prettytable
         field_names = ["Test Name", "Result", "Log"]
         system_info_field_names = ["Component", "Information"]
-        test_cnt_field_names = ["PASS", "FAIL", "ERROR", "SKIP"]
+        test_cnt_field_names = ["TOTAL", "PASS", "FAIL", "ERROR", "SKIP"]
         try:
             from prettytable import PrettyTable
             if tests_status:
@@ -166,7 +174,7 @@ class TestersExecutor(ConfigProcessor):
 
                 logger.info('\n' + summary_table.get_string(title="Summary"))
 
-                test_cnt_table.add_row([str(len(passed_tests)), str(len(failed_tests)), str(len(errored_tests)), str(len(skipped_tests))])
+                test_cnt_table.add_row([str(len(tests_status)), str(len(passed_tests)), str(len(failed_tests)), str(len(errored_tests)), str(len(skipped_tests))])
                 logger.info('\n' + test_cnt_table.get_string(title="Metrics"))
 
             system_info_table = PrettyTable()
@@ -174,6 +182,8 @@ class TestersExecutor(ConfigProcessor):
             system_info_table.add_row(["OS", (os_name if os_name else "Can't get OS name!") + " " + (os_version if os_version else "Can't get OS version")])
             system_info_table.add_row(["ROCm Agents", ", ".join(rocm_agents) if rocm_agents else "Can't get ROCm agents"])
             system_info_table.add_row(["/opt/rocm version", opt_rocm_version if opt_rocm_version else "Can't get /opt/rocm version"])
+            system_info_table.add_row(["CUDA RT Version", cuda_rt_version if cuda_rt_version else "Can't get CUDA RT Version"])
+            system_info_table.add_row(["CUDA GPUs", ", ".join(cuda_gpus) if cuda_gpus else "Can't get CUDA GPUs"])
             logger.info('\n' + system_info_table.get_string(title="System Information"))
         except Exception as error:
             logger.warning("For better UI experience, please pip3 install -r requirements.txt")
@@ -192,13 +202,15 @@ class TestersExecutor(ConfigProcessor):
 
                 logger.info("********Metrics********")
                 logger.info(" | ".join(test_cnt_field_names))
-                logger.info(str(len(passed_tests)) + " | " + str(len(failed_tests)) + " | " + str(len(errored_tests)) + " | " + str(len(skipped_tests)))
+                logger.info(str(len(tests_status)) + " | " + str(len(passed_tests)) + " | " + str(len(failed_tests)) + " | " + str(len(errored_tests)) + " | " + str(len(skipped_tests)))
 
             logger.info("********System Information********")
             logger.info(" | ".join(system_info_field_names))
             logger.info("OS" + " | " + (os_name if os_name else "Can't get OS name!") + " " + (os_version if os_version else "Can't get OS version"))
             logger.info("ROCm Agents" + " | " + ", ".join(rocm_agents) if rocm_agents else "Can't get ROCm agents")
             logger.info("/opt/rocm version" + " | " + opt_rocm_version if opt_rocm_version else "Can't get /opt/rocm version")
+            logger.info("CUDA RT Version" + " | " + cuda_rt_version if cuda_rt_version else "Can't get CUDA RT Version")
+            logger.info("CUDA GPUs" + " | " + ", ".join(cuda_gpus) if cuda_gpus else "Can't get CUDA GPUs")
 
         logger.info("Note, All log locations are relative to {log_location}".format(log_location=log_location))
 
@@ -210,15 +222,17 @@ class TestersExecutor(ConfigProcessor):
             test_root["status"] = test_status.name
             test_root["log_location"] = tests_logs[test]
 
+        json_root["num_total"] = len(tests_status)
         json_root["num_passed"] = len(passed_tests)
         json_root["num_failed"] = len(failed_tests)
         json_root["num_errored"] = len(errored_tests)
         json_root["num_skipped"] = len(skipped_tests)
-
         json_root["opt_rocm_version"] = opt_rocm_version
         json_root["os_name"] = os_name
         json_root["os_version"] = os_version
         json_root["rocm_agents"] = rocm_agents
+        json_root["cuda_gpus"] = cuda_gpus
+        json_root["cuda_rt_version"] = cuda_rt_version
         json_root["start_datetime"] = start_datetime.strftime("%Y_%m_%d_%H_%M_%S")
         json_root["end_datetime"] = end_datetime.strftime("%Y_%m_%d_%H_%M_%S")
         json_root["selected_test_filter"] = selected_test_filter
@@ -270,6 +284,28 @@ def get_opt_rocm_version() -> str:
     o = o.decode('utf-8')
     opt_rocm_version = o.strip('\n')
     return opt_rocm_version
+
+
+def get_cuda_rt_version() -> str:
+    cuda_rt_version = None
+    with open('/usr/local/cuda/version.json', "r") as f:
+        data = json.load(f)
+        try:
+            cuda_rt_version = data['cuda_cudart']['version']
+        except:
+            pass
+    return cuda_rt_version
+
+
+def get_cuda_gpus() -> List[str]:
+    cmd = "nvidia-smi --query-gpu=name --format=csv,noheader"
+    o, e = subprocess.Popen([cmd], shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, close_fds=True).communicate()
+    o = o.decode('utf-8')
+    if o:
+        cuda_gpus = o.strip('\n').split('\n')
+    else:
+        cuda_gpus = None
+    return cuda_gpus
 
 
 def get_passed_tests(tests_status: Dict[Test, TestResult]) -> Dict[Test, TestResult]:
