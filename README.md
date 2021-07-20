@@ -135,7 +135,7 @@ Below are the list of filters that can be applied currently after "-t":
 
 | Filter | Test cases executed |
 | ------ | ------------------- |
-| No filter | options provided All tests, except dtests, are executed by default. |
+| No filter options provided | All tests are executed by default. |
 | “samples” | Executes all test cases under HIP-Samples |
 | "samples:performance" | Executes all performance test cases under HIP-Samples |
 | "samples:mini-app" | Executes all mini-app test cases under HIP-Samples |
