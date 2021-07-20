@@ -1,4 +1,4 @@
-# Copyright (c) 2021-present Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2021 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -80,16 +80,22 @@ class TestSelector(GetTests):
         else:
             test_name_regexes = None
 
-        for test_of_tester in self.get_tests(log_location=log_location, quick=True):
-            select_this_test = self.to_select_this_test(test=test_of_tester, test_name_regexes=test_name_regexes)
-            if select_this_test:
-                tests.append(test_of_tester)
-
-        if not tests:
+        if test_name_regexes is None:
             for test_of_tester in self.get_tests(log_location=log_location, quick=False):
                 select_this_test = self.to_select_this_test(test=test_of_tester, test_name_regexes=test_name_regexes)
                 if select_this_test:
                     tests.append(test_of_tester)
+        else:
+            for test_of_tester in self.get_tests(log_location=log_location, quick=True):
+                select_this_test = self.to_select_this_test(test=test_of_tester, test_name_regexes=test_name_regexes)
+                if select_this_test:
+                    tests.append(test_of_tester)
+
+            if not tests:
+                for test_of_tester in self.get_tests(log_location=log_location, quick=False):
+                    select_this_test = self.to_select_this_test(test=test_of_tester, test_name_regexes=test_name_regexes)
+                    if select_this_test:
+                        tests.append(test_of_tester)
 
         return tests
 
