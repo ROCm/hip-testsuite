@@ -79,12 +79,12 @@ repos = {
     "mixbench": {
         "repo_url": "https://github.com/ekondis/mixbench.git",
         "branch": None,
-        # "commit_id": ""
+        "commit_id": "e1d6c00bd86d7d904b658213370ddb780a116d1f"
     },
     "gpu_stream": {
         "repo_url": "https://github.com/UoB-HPC/GPU-STREAM.git",
         "branch": None,
-        # "commit_id": ""
+        "commit_id": "6fe81e19556ac26761a1c7247ae29fa88fb4e0ab"
     },
     "rocclr": {
         "repo_url": "https://github.com/ROCm-Developer-Tools/ROCclr.git",
