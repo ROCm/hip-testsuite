@@ -40,6 +40,9 @@ class PrepareTest():
         self.hiprepo = "" # Default
         self.hipbranch = ""
         self.hipcommitId = ""
+        self.hipamdrepo = "" # Default
+        self.hipamdbranch = ""
+        self.hipamdcommitId = ""
         self.prepareobj = None
 
     def setrepoinfo(self, test_data: HIPTestData):
@@ -52,11 +55,23 @@ class PrepareTest():
             self.hipbranch = test_data.repos["hip"].branch
         if test_data.repos["hip"].commit_id != None:
             self.hipcommitId = test_data.repos["hip"].commit_id
+
+        if test_data.repos["hipamd"].repo_url != None:
+            self.hipamdrepo = test_data.repos["hipamd"].repo_url
+        else:
+            validrepconfig &= False
+        if test_data.repos["hipamd"].branch != None:
+            self.hipamdbranch = test_data.repos["hipamd"].branch
+        if test_data.repos["hipamd"].commit_id != None:
+            self.hipamdcommitId = test_data.repos["hipamd"].commit_id
         return validrepconfig
 
     def downloadtest(self, logFile):
-        return HipPackages().pull_repo(logFile, self.hiprepo, self.hipbranch,\
+        ret = HipPackages().pull_repo(logFile, self.hiprepo, self.hipbranch,\
         self.hipcommitId, "HIP")
+        ret = ret & HipPackages().pull_repo(logFile, self.hipamdrepo, self.hipamdbranch,\
+        self.hipamdcommitId, "hipamd")
+        return ret
 
     def buildtest(self, logFile, platform):
         isBinaryPresent = True

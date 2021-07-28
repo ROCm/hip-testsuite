@@ -19,6 +19,7 @@
 # THE SOFTWARE.
 
 from amd.common.hip_shell import execshellcmd
+
 import os
 
 # Common class to clone/pull dependent Packages
@@ -27,6 +28,7 @@ class HipPackages():
         self.cwdAbs = os.getcwd()
         self.conformancePath = os.path.join(self.cwdAbs, "src/amd/conformance/")
         self.hippath = os.path.join(self.conformancePath, "HIP/")
+        self.hipamdpath = os.path.join(self.conformancePath, "HIPAMD/")
         self.appPath = os.path.join(self.cwdAbs,"src/amd/applications/hip_examples/")
         self.examplepath = os.path.join(self.appPath, "HIP-Examples/")
         self.mixbenchpath = os.path.join(self.appPath, "mixbench/")
@@ -54,6 +56,10 @@ class HipPackages():
             repo_root_path = self.hippath
             repo_location = self.conformancePath
             repo_dir = "HIP"
+        elif reponame == "hipamd":
+            repo_root_path = self.hipamdpath
+            repo_location = self.conformancePath
+            repo_dir = "HIPAMD"
         elif reponame == "rocclr":
             repo_root_path = self.rocclrpath
             repo_location = self.conformancePath

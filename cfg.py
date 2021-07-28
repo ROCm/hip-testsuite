@@ -64,17 +64,22 @@ link_libs_path = None
 run_tests = None
 
 
-branch = "rocm-4.2.x"
+branch = None
 repos = {
     "hip_examples": {
         "repo_url": "https://github.com/ROCm-Developer-Tools/HIP-Examples",
-        "branch": branch,
-        # "commit_id": ""
+        "branch": None,
+        "commit_id": "8a3b04c9b10bae344c7483a63c13034869da184b"
     },
     "hip": {
         "repo_url": "https://github.com/ROCm-Developer-Tools/HIP",
-        "branch": branch,
-        # "commit_id": ""
+        "branch": None,
+        "commit_id": "586165ebc281eb9461898a5b2abbc74595f5d97d"
+    },
+    "hipamd": {
+        "repo_url": "https://github.com/ROCm-Developer-Tools/HIPAMD",
+        "branch": None,
+        "commit_id": "de01ce04677243116dba52b59406a130517ea4c7"
     },
     "mixbench": {
         "repo_url": "https://github.com/ekondis/mixbench.git",
@@ -87,13 +92,13 @@ repos = {
         "commit_id": "6fe81e19556ac26761a1c7247ae29fa88fb4e0ab"
     },
     "rocclr": {
-        "repo_url": "https://github.com/ROCm-Developer-Tools/ROCclr.git",
-        "branch": branch,
-        # "commit_id": ""
+        "repo_url": "https://github.com/ROCm-Developer-Tools/ROCclr",
+        "branch": None,
+        "commit_id": "0ca4f7939969004b9080d814a30cc8e34cdac833"
     },
     "opencl": {
-        "repo_url": "https://github.com/RadeonOpenCompute/ROCm-OpenCL-Runtime.git",
-        "branch": branch,
-        # "commit_id": ""
+        "repo_url": "https://github.com/RadeonOpenCompute/ROCm-OpenCL-Runtime",
+        "branch": None,
+        "commit_id": "bbdc87e08b322d349f82bdd7575c8ce94d31d276"
     }
 }

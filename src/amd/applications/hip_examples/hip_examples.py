@@ -43,6 +43,9 @@ class PrepareTest():
         self.hiprepo = "" # Default
         self.hipbranch = ""
         self.hipcommitId = ""
+        self.hipamdrepo = "" # Default
+        self.hipamdbranch = ""
+        self.hipamdcommitId = ""
         self.gpustrm_repo = ""
         self.gpustrm_branch = ""
         self.gpustrm_commitId = ""
@@ -59,6 +62,14 @@ class PrepareTest():
             self.hipbranch = test_data.repos["hip"].branch
         if test_data.repos["hip"].commit_id != None:
             self.hipcommitId = test_data.repos["hip"].commit_id
+        if test_data.repos["hipamd"].repo_url != None:
+            self.hipamdrepo = test_data.repos["hipamd"].repo_url
+        else:
+            return False
+        if test_data.repos["hipamd"].branch != None:
+            self.hipamdbranch = test_data.repos["hipamd"].branch
+        if test_data.repos["hipamd"].commit_id != None:
+            self.hipamdcommitId = test_data.repos["hipamd"].commit_id
         return True
 
     def set_hipex_repoinfo(self, test_data: HIPTestData):
@@ -104,8 +115,11 @@ class PrepareTest():
         return validrepconfig
 
     def download_deppackage(self, logFile):
-        return HipPackages().pull_repo(logFile, self.hiprepo, self.hipbranch,\
+        ret = HipPackages().pull_repo(logFile, self.hiprepo, self.hipbranch,\
         self.hipcommitId, "HIP")
+        ret = ret & HipPackages().pull_repo(logFile, self.hipamdrepo, self.hipamdbranch,\
+        self.hipamdcommitId, "hipamd")
+        return ret
 
     def download_hipexample(self, logFile):
         ret = self.download_deppackage(logFile)

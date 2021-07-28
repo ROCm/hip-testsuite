@@ -32,12 +32,13 @@ class BuildRunCommon():
     def __init__(self, logfile):
         self.logfile = logfile
         self.hippath = os.path.join(os.getcwd(), "src/amd/conformance/HIP")
+        self.hipamdpath = os.path.join(os.getcwd(),"src/amd/conformance/HIPAMD")
         self.rclrpath = os.path.join(os.getcwd(), "src/amd/conformance/ROCclr")
         self.oclpath = os.path.join(os.getcwd(), "src/amd/conformance/ROCm-OpenCL-Runtime")
 
     # Fetches all available dtests using ctest
     def get_all_ctest(self):
-        cmdexc = "cd " + self.hippath + "/build;"
+        cmdexc = "cd " + self.hipamdpath + "/build;"
         cmdexc += "ctest -N;"
         with open("ctest.txt", "w+") as ctestlog:
             execshellcmd_largedump(cmdexc, self.logfile, ctestlog, None)
@@ -69,7 +70,7 @@ class BuildRunCommon():
         cmdtest = "ctest -R " + testcase
         print("Executing command = " + cmdtest)
         # run test
-        cmd = "cd " + os.path.join(self.hippath, "build") + ";"
+        cmd = "cd " + os.path.join(self.hipamdpath, "build") + ";"
         cmd += cmdtest + ";"
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmd, log, runlogdump, envtoset)
@@ -92,6 +93,7 @@ class BuildRunAmd(BuildRunCommon):
         envtoset["ROCclr_DIR"] = self.rclrpath
         envtoset["OPENCL_DIR"] = self.oclpath
         envtoset["HIP_DIR"] = self.hippath
+        envtoset["HIP_AMD_DIR"] = self.hipamdpath
         return envtoset
 
     # Validate if rocclr build is successful
@@ -111,15 +113,13 @@ class BuildRunAmd(BuildRunCommon):
     # Validate if HIP build is successful
     def validate_hip_build(self):
         status = True
-        hip_install_inc = os.path.join(self.hippath, "build/install/include")
-        hip_install_lib = os.path.join(self.hippath, "build/install/lib")
-        hip_install_bin = os.path.join(self.hippath, "build/install/bin")
-        hip_install_rocclr = os.path.join(self.hippath, "build/install/rocclr")
+        hip_install_inc = os.path.join(self.hipamdpath, "build/install/include")
+        hip_install_lib = os.path.join(self.hipamdpath, "build/install/lib")
+        hip_install_bin = os.path.join(self.hipamdpath, "build/install/bin")
         hip_binaries = glob.glob(hip_install_lib + "/*.so*")
         status &= os.path.isdir(hip_install_inc)
         status &= os.path.isdir(hip_install_lib)
         status &= os.path.isdir(hip_install_bin)
-        status &= os.path.isdir(hip_install_rocclr)
         if len(hip_binaries) > 0:
             status &= True
         else:
@@ -131,37 +131,33 @@ class BuildRunAmd(BuildRunCommon):
         buildSuccess = True
         # Set environment
         envtoset = self.get_envvar()
-        # build rocclr
-        cmd = "cd \"$ROCclr_DIR\";"
-        cmd += "rm -Rf build;"
-        cmd += "mkdir -p build;cd build;"
-        cmd += "cmake -DOPENCL_DIR=\"$OPENCL_DIR\" -DCMAKE_INSTALL_PREFIX=\"$ROCclr_DIR/../opt/rocm/rocclr\" ..;"
-        cmd += "cmake -j;make install;"
-        cmdexc = cmd
-        runlogdump = tempfile.TemporaryFile("w+")
-        execshellcmd_largedump(cmdexc, self.logfile, runlogdump, envtoset)
-        runlogdump.close()
-        # Validate if rocclr build is successful
-        buildSuccess = self.validate_rocclr_build()
-        if buildSuccess == False:
-            print("rocclr build failed!")
-            return False
         # Build HIP
-        cmd = "cd \"$HIP_DIR\";"
+        cmd = "cd \"$HIP_AMD_DIR\";"
         cmd += "rm -Rf build;"
         cmd += "mkdir -p build;cd build;"
-        cmd += "cmake -DCMAKE_PREFIX_PATH=\"$ROCclr_DIR/build;/opt/rocm;$ROCclr_DIR/../opt/rocm/rocclr\" -DCMAKE_INSTALL_PREFIX=$PWD/install ..;"
-        cmd += "cmake -j;make install;"
-        cmd += "make -j8 build_tests"
+        cmd += "cmake -DHIP_COMPILER=clang -DHIP_PLATFORM=rocclr -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_INSTALL_PREFIX=$PWD/install" +\
+        " -DROCCLR_PATH=\"$ROCclr_DIR\" -DAMD_OPENCL_PATH=\"$OPENCL_DIR\" -DHIP_COMMON_DIR=\"$HIP_DIR\"" +\
+        " -DCMAKE_PREFIX_PATH=\"/opt/rocm/lib/cmake/hsa-runtime64;/opt/rocm/lib/cmake/amd_comgr\" ..;"
+        cmd += "make -j8;make install;"
+
         cmdexc = cmd
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmdexc, self.logfile, runlogdump, envtoset)
         runlogdump.close()
+
         # Validate if HIP build is successful
         buildSuccess = self.validate_hip_build()
         if buildSuccess == False:
             print("HIP build failed!")
             return False
+
+        # Build Dtest
+        cmd = "cd \"$HIP_AMD_DIR\";cd build;"
+        cmd += "make -j8 build_tests;"
+        cmdexc = cmd
+        runlogdump = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logfile, runlogdump, envtoset)
+        runlogdump.close()
         return True
 
     # Execute test cases
@@ -172,9 +168,7 @@ class BuildRunAmd(BuildRunCommon):
     # Clean the test
     def clean(self):
         envtoset = self.get_envvar()
-        cmd = "cd \"$ROCclr_DIR\";"
-        cmd += "rm -Rf build;rm -Rf $ROCclr_DIR/../opt;"
-        cmd += "cd \"$HIP_DIR\";"
+        cmd = "cd \"$HIP_AMD_DIR\";"
         cmd += "rm -Rf build;"
         execshellcmd(cmd, None, envtoset)
 
@@ -193,13 +187,14 @@ class BuildRunNvidia(BuildRunCommon):
         envtoset["HIP_COMPILER"] = "nvcc"
         envtoset["HIP_RUNTIME"] = "cuda"
         envtoset["HIP_DIR"] = self.hippath
+        envtoset["HIP_AMD_DIR"] = self.hipamdpath
         return envtoset
 
     # Validate if HIP build is successful
     def validate_hip_build(self):
         status = True
-        hip_install_inc = os.path.join(self.hippath, "build/install/include")
-        hip_install_bin = os.path.join(self.hippath, "build/install/bin")
+        hip_install_inc = os.path.join(self.hipamdpath, "build/install/include")
+        hip_install_bin = os.path.join(self.hipamdpath, "build/install/bin")
         status &= os.path.isdir(hip_install_inc)
         status &= os.path.isdir(hip_install_bin)
         return status
@@ -210,12 +205,12 @@ class BuildRunNvidia(BuildRunCommon):
         # Set environment
         envtoset = self.get_envvar()
         # Build HIP
-        cmd = "cd \"$HIP_DIR\";"
+        cmd = "cd \"$HIP_AMD_DIR\";"
         cmd += "rm -Rf build;"
         cmd += "mkdir -p build;cd build;"
-        cmd += "cmake -DHIP_PLATFORM=nvidia -DCMAKE_INSTALL_PREFIX=$PWD/install ..;"
+        cmd += "cmake -DHIP_PLATFORM=nvidia -DCMAKE_INSTALL_PREFIX=$PWD/install -DHIP_COMMON_DIR=\"$HIP_DIR\"" + \
+        " -DHIP_AMD_BACKEND_SOURCE_DIR=\"$HIP_AMD_DIR\" .. ;"
         cmd += "make install;"
-        cmd += "make -j8 build_tests"
         cmdexc = cmd
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmdexc, self.logfile, runlogdump, envtoset)
@@ -225,6 +220,14 @@ class BuildRunNvidia(BuildRunCommon):
         if buildSuccess == False:
             print("HIP build failed!")
             return False
+        # Build Dtest
+        cmd = "cd \"$HIP_AMD_DIR\";cd build;"
+        cmd += "make -j8 build_tests;"
+        cmdexc = cmd
+        runlogdump = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logfile, runlogdump, envtoset)
+        runlogdump.close()
+
         return True
 
     # Execute test cases
@@ -235,6 +238,6 @@ class BuildRunNvidia(BuildRunCommon):
     # Clean the test
     def clean(self):
         envtoset = self.get_envvar()
-        cmd = "cd \"$HIP_DIR\";"
+        cmd = "cd \"$HIP_AMD_DIR\";"
         cmd += "rm -Rf build;"
         execshellcmd(cmd, None, envtoset)
