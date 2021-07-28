@@ -35,6 +35,9 @@ class PrepareTest():
         self.hiprepo = "" # Default
         self.hipbranch = ""
         self.hipcommitId = ""
+        self.hipamdrepo = "" # Default
+        self.hipamdbranch = ""
+        self.hipamdcommitId = ""
         self.rocclrrepo = "" # Default
         self.rocclrbranch = ""
         self.rocclrcommitId = ""
@@ -56,6 +59,16 @@ class PrepareTest():
             self.hipbranch = test_data.repos["hip"].branch
         if test_data.repos["hip"].commit_id != None:
             self.hipcommitId = test_data.repos["hip"].commit_id
+
+        if test_data.repos["hipamd"].repo_url != None:
+            self.hipamdrepo = test_data.repos["hipamd"].repo_url
+        else:
+            return False
+        if test_data.repos["hipamd"].branch != None:
+            self.hipamdbranch = test_data.repos["hipamd"].branch
+        if test_data.repos["hipamd"].commit_id != None:
+            self.hipamdcommitId = test_data.repos["hipamd"].commit_id
+
         if test_data.repos["rocclr"].repo_url != None:
             self.rocclrrepo = test_data.repos["rocclr"].repo_url
         else:
@@ -64,6 +77,7 @@ class PrepareTest():
             self.rocclrbranch = test_data.repos["rocclr"].branch
         if test_data.repos["rocclr"].commit_id != None:
             self.rocclrcommitId = test_data.repos["rocclr"].commit_id
+
         if test_data.repos["opencl"].repo_url != None:
             self.openclrepo = test_data.repos["opencl"].repo_url
         else:
@@ -78,6 +92,8 @@ class PrepareTest():
     def downloadTest(self, log, platform):
         ret = HipPackages().pull_repo(log, self.hiprepo, self.hipbranch,\
         self.hipcommitId, "HIP")
+        ret &= HipPackages().pull_repo(log, self.hipamdrepo, self.hipamdbranch,\
+        self.hipamdcommitId, "hipamd")
         if platform == HIP_PLATFORM.amd:
             ret &= HipPackages().pull_repo(log, self.rocclrrepo, self.rocclrbranch,\
             self.rocclrcommitId, "rocclr")

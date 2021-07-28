@@ -322,6 +322,7 @@ class BuildRunAmd(BuildRunCommon):
 class BuildRunNvidia(BuildRunCommon):
     def __init__(self, path):
         self.hippath = os.path.join(os.getcwd(),"src/amd/conformance/HIP/")
+        self.hipamdpath = os.path.join(os.getcwd(),"src/amd/conformance/HIPAMD/")
         BuildRunCommon.__init__(self, path)
 
     def getenvironmentvariables(self):
@@ -330,25 +331,27 @@ class BuildRunNvidia(BuildRunCommon):
         envtoset["HIP_COMPILER"] = "nvcc"
         envtoset["HIP_RUNTIME"] = "cuda"
         envtoset["HIP_DIR"] = self.hippath
-        envtoset["HIP_PATH"] = os.path.join(self.hippath, "build")
+        envtoset["HIP_AMD_DIR"] = self.hipamdpath
+        envtoset["HIP_PATH"] = os.path.join(self.hipamdpath, "build")
         return envtoset
 
     def setupenvironmentfornvcc(self, logFile):
-        cmdcd = "cd "+self.hippath+";"
+        cmdcd = "cd " + self.hipamdpath + ";"
         envtoset = self.getenvironmentvariables()
         cmdsetenv = "rm -Rf build/;mkdir build;cd build;"
-        cmdbuildinstall = "cmake -DHIP_PLATFORM=nvidia -DCMAKE_INSTALL_PREFIX=$PWD/install ..;"
+        cmdbuildinstall =\
+        "cmake -DHIP_PLATFORM=nvidia -DCMAKE_INSTALL_PREFIX=$PWD/install -DHIP_COMMON_DIR=\"$HIP_DIR\" -DHIP_AMD_BACKEND_SOURCE_DIR=\"$HIP_AMD_DIR\" ..;"
         cmdbuildinstall += "make install;"
         cmdexc = cmdcd + cmdsetenv + cmdbuildinstall
         execshellcmd(cmdexc, logFile, envtoset)
 
     def buildtest(self, logFile, testid):
         buildbindirpresent = os.path.isdir(\
-        os.path.join(self.hippath, "build/bin"))
+        os.path.join(self.hipamdpath, "build/bin"))
         buildincludedirpresent = os.path.isdir(\
-        os.path.join(self.hippath, "build/include"))
+        os.path.join(self.hipamdpath, "build/include"))
         buildinstalldirpresent = os.path.isdir(\
-        os.path.join(self.hippath, "build/install"))
+        os.path.join(self.hipamdpath, "build/install"))
         if not (buildbindirpresent & buildincludedirpresent & buildinstalldirpresent):
             self.setupenvironmentfornvcc(logFile)
         env = self.getenvironmentvariables()
