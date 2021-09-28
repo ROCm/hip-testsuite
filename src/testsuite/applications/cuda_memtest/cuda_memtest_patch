@@ -1,0 +1,11 @@
+--- cuda_memtest.cu	2021-09-21 20:23:48.117207109 +0530
++++ cuda_memtest_modified.cu	2021-09-21 20:20:52.553149253 +0530
+@@ -168,7 +168,7 @@
+         {
+             //create cuda mapped memory
+             hipHostMalloc((void**)&mappedHostPtr,tot_num_blocks* BLOCKSIZE,hipHostMallocMapped);
+-            hipHostGetDevicePointer(&ptr,mappedHostPtr,0);
++            hipHostGetDevicePointer((void **)&ptr,mappedHostPtr,0);
+         }
+         else
+         {

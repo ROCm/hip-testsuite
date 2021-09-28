@@ -1,0 +1,120 @@
+diff --git a/runtime/computation.hpp b/runtime/computation.hpp
+index 81b4497..1d29deb 100644
+--- a/runtime/computation.hpp
++++ b/runtime/computation.hpp
+@@ -67,8 +67,8 @@ numerics::solver_state init_state(Discrete const &discrete, real_t t = 0_r) {
+ }
+ 
+ inline void sync(numerics::solver_state &state) {
+-#ifdef __CUDACC__
+-  if (cudaDeviceSynchronize() != cudaSuccess)
++#ifdef __HIPCC__
++  if (hipDeviceSynchronize() != hipSuccess)
+     throw std::runtime_error("device sync failed");
+ #endif
+ }
+diff --git a/runtime/device/set_device.cpp b/runtime/device/set_device.cpp
+index c3c6e8f..4efc8d7 100644
+--- a/runtime/device/set_device.cpp
++++ b/runtime/device/set_device.cpp
+@@ -9,25 +9,24 @@
+  */
+ #include "set_device.hpp"
+ #include <stdexcept>
+-
++#include <hip/hip_runtime.h>
+ namespace runtime {
+-
+-#ifdef __CUDACC__
++#ifdef __HIPCC__	
+ int set_device(int device_id) {
+   int device_count = 1;
+-  if (cudaGetDeviceCount(&device_count) != cudaSuccess)
+-    throw std::runtime_error("cudaGetDeviceCount failed");
++  if (hipGetDeviceCount(&device_count) != hipSuccess)
++    throw std::runtime_error("hipGetDeviceCount failed");
+   device_id %= device_count;
+-  if (cudaSetDevice(device_id) != cudaSuccess)
+-    throw std::runtime_error("cudaSetDevice failed");
++  if (hipSetDevice(device_id) != hipSuccess)
++    throw std::runtime_error("hipSetDevice failed");
+   if (device_count > 1) {
+     for (int i = 0; i < device_count; ++i) {
+       if (i != device_id) {
+         int flag;
+-        if (cudaDeviceCanAccessPeer(&flag, device_id, i) != cudaSuccess)
++        if (hipDeviceCanAccessPeer(&flag, device_id, i) != hipSuccess)
+           throw std::runtime_error("cudaDeviceAccessPeer failed");
+         if (flag) {
+-          cudaDeviceEnablePeerAccess(i, 0);
++          hipDeviceEnablePeerAccess(i, 0);
+         }
+       }
+     }
+diff --git a/runtime/gcl/run.cpp b/runtime/gcl/run.cpp
+index 827e567..8bcdcfe 100644
+--- a/runtime/gcl/run.cpp
++++ b/runtime/gcl/run.cpp
+@@ -19,7 +19,7 @@ namespace gcl_impl {
+ 
+ using pattern_t = gt::halo_exchange_dynamic_ut<storage_info_ijk_t::layout_t,
+                                                gt::layout_map<0, 1, 2>, real_t,
+-#ifdef __CUDACC__
++#ifdef __HIPCC__
+                                                gt::gcl_gpu
+ #else
+                                                gt::gcl_cpu
+@@ -103,8 +103,8 @@ struct process_grid::impl {
+ 
+     pattern->setup(1);
+ 
+-#ifdef __CUDACC__
+-    cudaStreamSynchronize(0);
++#ifdef __HIPCC__
++    hipStreamSynchronize(0);
+ #endif
+ 
+     return [pattern = std::move(pattern)](storage_t &storage) {
+diff --git a/runtime/ghex_comm/run.cpp b/runtime/ghex_comm/run.cpp
+index 60e9e35..21c2777 100644
+--- a/runtime/ghex_comm/run.cpp
++++ b/runtime/ghex_comm/run.cpp
+@@ -82,7 +82,7 @@ runtime::runtime(int num_threads, std::array<int, 2> cart_dims,
+           "the product of thread cart dims must be equal to the number of "
+           "threads per rank.");
+   }
+-#ifdef __CUDACC__
++#ifdef __HIPCC__
+   MPI_Comm shmem_comm;
+   MPI_Comm_split_type(MPI_COMM_WORLD, MPI_COMM_TYPE_SHARED, 0, MPI_INFO_NULL,
+                       &shmem_comm);
+@@ -308,8 +308,8 @@ public:
+                           &patterns = *m_patterns](storage_t &storage) mutable {
+       auto field = gt::ghex::wrap_gt_field(domain, storage);
+ 
+-#ifdef __CUDACC__
+-      cudaStreamSynchronize(0);
++#ifdef __HIPCC__
++      hipStreamSynchronize(0);
+ #endif
+       comm_obj->exchange(patterns(field)).wait();
+     };
+@@ -356,7 +356,7 @@ void runtime_register_options(ghex_comm, options &options) {
+           "dimensons of cartesian decomposition "
+           "among sub-domains",
+           "TX TY", 2);
+-#ifdef __CUDACC__
++#ifdef __HIPCC__
+   options("device-mapping",
+           "node device mapping: device id per sub-domain in the format "
+           "I_0:I_1:...:I_(N-1) "
+@@ -368,7 +368,7 @@ void runtime_register_options(ghex_comm, options &options) {
+ 
+ runtime runtime_init(ghex_comm, options_values const &options) {
+   std::vector<int> device_mapping;
+-#ifdef __CUDACC__
++#ifdef __HIPCC__
+   if (options.has("device-mapping")) {
+     const std::regex delimiter(":");
+     const auto input = options.get<std::string>("device-mapping");
+
