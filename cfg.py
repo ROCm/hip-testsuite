@@ -130,10 +130,5 @@ repos = {
         "repo_url": "https://github.com/CEED/Laghos.git",
         "branch": None,
         "commit_id": "a7f6123d42847f6bdbdb614f5af876541f49cd16"
-    },
-    "openmpi": {
-        "repo_url": "http://github.com/open-mpi/ompi.git openmpi",
-        "branch": "v4.0.x",
-        "commit_id": "4dc196d8c60aadeb34b0df9d226ab4c341004704"
     }
 }

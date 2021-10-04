@@ -26,8 +26,8 @@ if __name__ == "__main__":
     sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 
-from testsuite.TestersExecutor import TestersExecutor
-from testsuite.list_tests import list_tests
+from hiptestsuite.TestersExecutor import TestersExecutor
+from hiptestsuite.list_tests import list_tests
 import cfg
 
 
