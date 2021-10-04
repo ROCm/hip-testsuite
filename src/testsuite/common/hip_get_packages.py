@@ -48,22 +48,22 @@ class HipPackages():
         self.cudamemrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/cuda_memtest/")
         self.cudamemapppath = os.path.join(self.cudamemrootpath, "cuda_memtest/")
         # Quicksilver
-        self.qsrootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/quicksilver/")
+        self.qsrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/quicksilver/")
         self.qsapppath = os.path.join(self.qsrootpath, "Quicksilver/")
         # Gridtools
-        self.gridtoolsrootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/gridtools/GridTools/")
+        self.gridtoolsrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/gridtools/GridTools/")
         self.gridtoolsapppath = os.path.join(self.gridtoolsrootpath, "gridtools/")
-        self.gtbenchrootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/gridtools/GridTools/")
+        self.gtbenchrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/gridtools/GridTools/")
         self.gtbenchapppath = os.path.join(self.gtbenchrootpath, "gtbench/")
         # Kokkos
-        self.kokkosrootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/kokkos/")
+        self.kokkosrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/kokkos/")
         self.kokkosapppath = os.path.join(self.kokkosrootpath, "kokkos/")
         # Laghos
-        self.mfemrootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/laghos/")
+        self.mfemrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/laghos/")
         self.mfemapppath = os.path.join(self.mfemrootpath, "mfem/")
-        self.laghosrootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/laghos/")
+        self.laghosrootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/laghos/")
         self.laghosapppath = os.path.join(self.laghosrootpath, "Laghos/")
-        self.mpirootpath = os.path.join(self.cwdAbs, "src/testsuite/hpc_apps/laghos/")
+        self.mpirootpath = os.path.join(self.cwdAbs, "src/testsuite/applications/hpc_apps/laghos/")
         self.mpiapppath = os.path.join(self.mpirootpath, "openmpi/")        
 
     def pull_repo(self, logFile, repo, branch, commitId, reponame):

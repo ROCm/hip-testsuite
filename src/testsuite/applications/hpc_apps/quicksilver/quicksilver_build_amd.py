@@ -20,7 +20,7 @@
 
 import os
 from testsuite.common.hip_shell import execshellcmd
-from testsuite.hpc_apps.quicksilver.quicksilver_parser_common import QuicksilverParser
+from testsuite.applications.hpc_apps.quicksilver.quicksilver_parser_common import QuicksilverParser
 
 class BuildRunAmd():
     def __init__(self, thistestpath, logFile):

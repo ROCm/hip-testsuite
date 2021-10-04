@@ -22,7 +22,7 @@ import os
 import re
 import tempfile
 from testsuite.common.hip_shell import *
-from testsuite.hpc_apps.kokkos.kokkos_parser_common import KokkosParser
+from testsuite.applications.hpc_apps.kokkos.kokkos_parser_common import KokkosParser
 
 class BuildRunAmd():
     def __init__(self, thistestpath, logFile):

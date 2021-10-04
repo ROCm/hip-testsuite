@@ -22,7 +22,7 @@ from testsuite.TesterRepository import Tester, Test, TestData
 from testsuite.Test import HIPTestData, TestResult, HIP_PLATFORM
 from typing import Union, List
 from testsuite.test_classifier import TestClassifier
-from testsuite.hpc_apps.quicksilver.quicksilver_build_amd import BuildRunAmd
+from testsuite.applications.hpc_apps.quicksilver.quicksilver_build_amd import BuildRunAmd
 from testsuite.common.hip_get_packages import HipPackages
 from testsuite.common.hip_shell import execshellcmd
 
@@ -34,7 +34,7 @@ class PrepareTest():
         self.cwdAbs = cwd
         self.binary = binary
         self.app_path = os.path.join(self.cwdAbs,\
-        "src/testsuite/hpc_apps/quicksilver/")
+        "src/testsuite/applications/hpc_apps/quicksilver/")
         self.app_root = os.path.join(self.app_path, "Quicksilver/")
         self.thistestpath = self.app_root
         self.prepareobj = None

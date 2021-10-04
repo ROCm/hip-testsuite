@@ -22,7 +22,7 @@ from testsuite.TesterRepository import Tester, Test, TestData
 from testsuite.Test import HIPTestData, TestResult, HIP_PLATFORM
 from typing import Union, List
 from testsuite.test_classifier import TestClassifier
-from testsuite.hpc_apps.gridtools.gridtools_build_amd import BuildRunAmd
+from testsuite.applications.hpc_apps.gridtools.gridtools_build_amd import BuildRunAmd
 from testsuite.common.hip_get_packages import HipPackages
 from testsuite.common.hip_shell import execshellcmd
 
@@ -33,7 +33,7 @@ class PrepareTest():
     def __init__(self, cwd):
         self.cwdAbs = cwd
         self.app_path = os.path.join(self.cwdAbs,\
-        "src/testsuite/hpc_apps/gridtools")
+        "src/testsuite/applications/hpc_apps/gridtools")
         self.thistestpath = self.app_path
         self.prepareobj = None
         self.gridtoolsrepo = "" # Default
@@ -140,8 +140,8 @@ class GRIDTOOLSCONVG(Tester, PrepareTest):
         # Check if Boost package exists
         if not os.path.isfile(\
         os.path.join(self.thistestpath, "boost_1_72_0.tar.bz2")):
-            print("Boost Package boost_1_72_0.tar.bz2 not available under src/testsuite/hpc_apps/gridtools/.")
-            print("Please download and copy Boost package in src/testsuite/hpc_apps/gridtools folder.")
+            print("Boost Package boost_1_72_0.tar.bz2 not available under src/testsuite/applications/hpc_apps/gridtools/.")
+            print("Please download and copy Boost package in src/testsuite/applications/hpc_apps/gridtools folder.")
             test_data.test_result = TestResult.ERROR
             return
         # Create GT_TREE_DIR
@@ -203,8 +203,8 @@ class GRIDTOOLSPERF(Tester, PrepareTest):
         # Check if Boost package exists
         if not os.path.isfile(\
         os.path.join(self.thistestpath, "boost_1_72_0.tar.bz2")):
-            print("Boost Package boost_1_72_0.tar.bz2 not available under src/testsuite/hpc_apps/gridtools/.")
-            print("Please download and copy Boost package in src/testsuite/hpc_apps/gridtools folder.")
+            print("Boost Package boost_1_72_0.tar.bz2 not available under src/testsuite/applications/hpc_apps/gridtools/.")
+            print("Please download and copy Boost package in src/testsuite/applications/hpc_apps/gridtools folder.")
             test_data.test_result = TestResult.ERROR
             return
 

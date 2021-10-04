@@ -23,7 +23,7 @@ import re
 import tempfile
 from testsuite.Test import HIPTestData
 from testsuite.common.hip_shell import *
-from testsuite.hpc_apps.laghos.laghos_parser_common import LaghosParser
+from testsuite.applications.hpc_apps.laghos.laghos_parser_common import LaghosParser
 
 class BuildRunAmd():
     def __init__(self, thistestpath, logFile):
