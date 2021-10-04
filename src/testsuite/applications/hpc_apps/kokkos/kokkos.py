@@ -22,7 +22,7 @@ from testsuite.TesterRepository import Tester, Test, TestData
 from testsuite.Test import HIPTestData, TestResult, HIP_PLATFORM
 from typing import Union, List
 from testsuite.test_classifier import TestClassifier
-from testsuite.hpc_apps.kokkos.kokkos_build_amd import BuildRunAmd
+from testsuite.applications.hpc_apps.kokkos.kokkos_build_amd import BuildRunAmd
 from testsuite.common.hip_get_packages import HipPackages
 from testsuite.common.hip_shell import execshellcmd
 
@@ -33,7 +33,7 @@ class PrepareTest():
     def __init__(self, cwd):
         self.cwdAbs = cwd
         self.app_path = os.path.join(self.cwdAbs,\
-        "src/testsuite/hpc_apps/kokkos/")
+        "src/testsuite/applications/hpc_apps/kokkos/")
         self.app_root = os.path.join(self.app_path, "kokkos/")
         self.thistestpath = self.app_root
         self.prepareobj = None

@@ -21,7 +21,7 @@
 import os
 import tempfile
 from testsuite.common.hip_shell import *
-from testsuite.hpc_apps.gridtools.gridtools_parser_common import GridtoolsParser
+from testsuite.applications.hpc_apps.gridtools.gridtools_parser_common import GridtoolsParser
 
 class BuildRunAmd():
     def __init__(self, thistestpath, logFile):
@@ -37,7 +37,7 @@ class BuildRunAmd():
         env += "export ROCMHOME=/opt/rocm;"
         env += "export PATH=$ROCMHOME/bin:$ROCMHOME/llvm/bin:$ROCMHOME/hip/bin:$ROCMHOME/opencl/bin:$ROCMHOME/rocprofiler/bin:$PATH;"
         env += "export LD_LIBRARY_PATH=/$ROCMHOME/lib:$ROCMHOME/llvm/lib:$LD_LIBRARY_PATH;"
-        env += "export GT_ALL_DIR=$PWD/src/testsuite/hpc_apps/gridtools;"
+        env += "export GT_ALL_DIR=$PWD/src/testsuite/applications/hpc_apps/gridtools;"
         env += "export GT_TREE_DIR=$GT_ALL_DIR/GridTools;"
         env += "export BOOST_TREE_DIR=$GT_TREE_DIR/boost_1_72_0;"
         env += "export BOOST_INSTALL_DIR=$GT_ALL_DIR/boost_1_72_0;"
