@@ -22,7 +22,7 @@ from hiptestsuite.AMD import AMDObject
 from hiptestsuite.TesterRepository import TesterRepository, Test, GetTests
 from typing import Union, List, Dict
 
-import re
+import re, sys, os
 
 
 class TestSelector(GetTests):
@@ -30,16 +30,22 @@ class TestSelector(GetTests):
         AMDObject.__init__(self)
         GetTests.__init__(self, tester_repository=tester_repository)
 
-    def to_select_this_test(self, test: Test, test_name_regexes):
+    def to_select_this_test(self, test: Test, test_name_regexes, exclude_module_paths=None):
         test_name = test.test_name
         also_matched_with_test_names = test.also_matched_with_test_names
         applicable_for_target = test.applicable_for_target
         classifiers = test.classifiers
 
         select_this_test = False
+        class_abs_path = os.path.abspath(sys.modules[test.tester.__class__.__module__].__file__)
 
         if test_name_regexes is None:
             select_this_test = True
+            for exclude_module_path in exclude_module_paths:
+                if exclude_module_path in class_abs_path:
+                    print("Warning: Test " + test_name + " is excluded, please run selectively")
+                    select_this_test = False
+                    break
         else:
             for test_name_regex in test_name_regexes:
                 test_name_regex: Union[str, List[str]] = test_name_regex
@@ -108,7 +114,7 @@ class TestSelector(GetTests):
         for myclassifier in testclassifier:
             self.get_all_classifierkeys(myclassifier.matched_with_names, classifierlist)
 
-    def select_tests(self, log_location: str) -> List[Test]:
+    def select_tests(self, log_location: str, exclude_module_paths) -> List[Test]:
         config = self.config
         tests = list()
         run_tests = config.run_tests
@@ -121,7 +127,7 @@ class TestSelector(GetTests):
 
         if test_name_regexes is None:
             for test_of_tester in self.get_tests(log_location=log_location, quick=False):
-                select_this_test = self.to_select_this_test(test=test_of_tester, test_name_regexes=test_name_regexes)
+                select_this_test = self.to_select_this_test(test=test_of_tester, test_name_regexes=test_name_regexes, exclude_module_paths=exclude_module_paths)
                 if select_this_test:
                     tests.append(test_of_tester)
         else:

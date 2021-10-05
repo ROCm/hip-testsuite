@@ -61,10 +61,13 @@ def parse_args():
 
 
 def main():
+    # Exclude tests from thirdparty folder
+    exclude_module_paths = ["hiptestsuite/thirdparty"]
+
     if parse_args():
         tester_executor: TestersExecutor = TestersExecutor()
         tester_executor.config = cfg
-        tester_executor.executeTests()
+        tester_executor.executeTests(exclude_module_paths=exclude_module_paths)
 
 
 if __name__ == "__main__":

@@ -108,13 +108,16 @@ class Hipconformance(Tester, PrepareTest):
         # Download repos
         self.downloadresult = self.downloadTest(self.logfd, get_tests_data.HIP_PLATFORM)
         if not self.downloadresult:
-            print("Rocm packages download failed!")
+            cmd = "echo \"Rocm packages download failed!\";"
+            execshellcmd(cmd, self.logfd, None)
             return testlist
 
         print("Building HIP package ...")
         # Build Rocclr and Hip
         self.buildresult = self.build_package(self.logfd, get_tests_data.HIP_PLATFORM)
         if not self.buildresult:
+            cmd = "echo \"Rocm packages build failed!!\";"
+            execshellcmd(cmd, self.logfd, None)
             print("Rocm packages build failed!")
             return testlist
 
@@ -131,7 +134,7 @@ class Hipconformance(Tester, PrepareTest):
             test.tester = self
             testlist.append(test)
         return testlist
-    
+
     def get_test_classifiers(self) -> Union[None, List[TestClassifier]]:
         category = CONFORMANCE()
         category.add_matched_with_names()
@@ -139,11 +142,15 @@ class Hipconformance(Tester, PrepareTest):
 
     def test(self, test_data: HIPTestData):
         if not self.downloadresult:
-            test_data.test_result = TestResult.FAIL
+            test_data.test_result = TestResult.ERROR
+            cmd = "echo \"HIP Catch2 Build FAILED!\";"
+            execshellcmd(cmd, self.logfd, None)
             return
 
         if not self.buildresult:
-            test_data.test_result = TestResult.FAIL
+            test_data.test_result = TestResult.ERROR
+            cmd = "echo \"HIP Catch2 Build FAILED!\";"
+            execshellcmd(cmd, self.logfd, None)
             return
         # Build test
         print("Running test: " + test_data.test.test_name + "..........")

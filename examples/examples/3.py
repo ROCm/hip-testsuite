@@ -18,9 +18,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from amd.TesterRepository import Tester
-from amd.Test import HIPTestData, TestResult, Test
-from amd.test_classifier import TestClassifier
+from hiptestsuite.TesterRepository import Tester
+from hiptestsuite.Test import HIPTestData, TestResult, Test
+from hiptestsuite.test_classifier import TestClassifier
 
 from typing import List, Union
 

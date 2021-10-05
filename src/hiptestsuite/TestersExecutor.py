@@ -40,7 +40,7 @@ class TestersExecutor(ConfigProcessor):
     def __init__(self):
         ConfigProcessor.__init__(self)
 
-    def executeTests(self, tester_repository: TesterRepository=None):
+    def executeTests(self, tester_repository: TesterRepository=None, exclude_module_paths=None):
         start_datetime = datetime.datetime.now()
         config = self.config
         log_location = config.log_location
@@ -76,7 +76,7 @@ class TestersExecutor(ConfigProcessor):
 
         test_selector: TestSelector = TestSelector(tester_repository=tester_repository)
         test_selector.config = config
-        tests: List[Test] = test_selector.select_tests(log_location=timestamped_log_location)
+        tests: List[Test] = test_selector.select_tests(log_location=timestamped_log_location, exclude_module_paths=exclude_module_paths)
         tests: List[Test] = sorted(tests, key=lambda x: x.test_name)
         tests_status = dict()
         tests_logs = dict()
@@ -239,6 +239,10 @@ class TestersExecutor(ConfigProcessor):
 
         with open(os.path.join(timestamped_log_location, 'report.json'), 'w+', encoding='utf-8') as f:
             json.dump(json_root, f, ensure_ascii=False, indent=4)
+
+        print("")
+        print("Test Complete: Log file directory is " + relative_timestamped_log_location)
+
 
 
 def get_os_name() -> str:
