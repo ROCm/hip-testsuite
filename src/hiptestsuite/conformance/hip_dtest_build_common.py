@@ -68,22 +68,29 @@ class BuildRunCommon():
     # Parse the test result
     def parsetest(self, log):
         log.seek(0)
-        text = log.read()
+        logbytes = log.read()
+        logutf = logbytes.decode('utf-8', errors='ignore')
         status = None
-        if re.search("100% tests passed", text) != None:
+        if re.search("100% tests passed", logutf) != None:
             status = "PASSED"
         else:
             status = "FAILED"
         return status
 
     # Execute the test case
-    def runtest(self, log, testcase, envtoset):
-        cmdtest = "ctest -R " + "\"" + testcase + "\""
+    def runtest(self, log, verbosity, testcase, envtoset):
+        if verbosity == 0:
+            cmdtest = "ctest -R " + "\"" + testcase + "\""
+        elif verbosity == 1:
+            cmdtest = "ctest -R " + "\"" + testcase + "\"" + " --verbose"
+        else:
+            cmdtest = "ctest -R " + "\"" + testcase + "\""
+
         print("Executing command = " + cmdtest)
         # run test
         cmd = "cd " + self.builddir + ";"
         cmd += cmdtest + ";"
-        runlogdump = tempfile.TemporaryFile("w+")
+        runlogdump = tempfile.TemporaryFile("wb+")
         execshellcmd_largedump(cmd, log, runlogdump, envtoset)
         status = self.parsetest(runlogdump)
         runlogdump.close()

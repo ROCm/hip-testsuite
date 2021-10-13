@@ -74,10 +74,10 @@ class PrepareTest():
         return self.buildobj.build_package()
 
     # Run test
-    def runtest(self, logFile, testcase):
+    def runtest(self, logFile, verbosity, testcase):
         status = "Failed"
         if self.buildobj != None:
-            status = self.buildobj.runtest(logFile, testcase)
+            status = self.buildobj.runtest(logFile, verbosity, testcase)
         return status
 
     # Get ctest info
@@ -157,8 +157,8 @@ class Hipconformance(Tester, PrepareTest):
         testcase = test_data.test.test_name
         status = None
 
-        with open(test_data.log_location + "/test.log", 'w+') as testLogger:
-            status = self.runtest(testLogger, testcase)
+        with open(test_data.log_location + "/test.log", 'wb+') as testLogger:
+            status = self.runtest(testLogger, test_data.CONFORMANCE_VERBOSE, testcase)
 
         if status == "PASSED":
             test_data.test_result = TestResult.PASS

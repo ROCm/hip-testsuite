@@ -32,6 +32,7 @@ class BuildRunNvidia(BuildRunCommon):
     '''
     def __init__(self, logfile):
         BuildRunCommon.__init__(self, logfile)
+        self.envtoset = os.environ.copy()
 
     def setenv(self):
         env = "export HIP_PLATFORM=nvidia;"
@@ -50,15 +51,13 @@ class BuildRunNvidia(BuildRunCommon):
             # Build HIP
             print("Catch2 test not built. Building Catch2 ..")
             cmd = self.setenv()
-            cmd += "cd " + self.hippath + "/tests/catch;"
-            cmd += "patch -p0 < ../../../CMakePatch;"
             cmd += "cd " + self.hippath + ";"
             cmd += "mkdir build; cd build;"
             cmd += "cmake -DHIP_COMPILER=nvcc -DHIP_PLATFORM=nvidia -DHIP_RUNTIME=cuda -DHIP_PATH=/opt/rocm/hip ../tests/catch;"
             cmd += "make -j build_tests;"
             cmdexc = cmd
             runlogdump = tempfile.TemporaryFile("w+")
-            execshellcmd_largedump(cmdexc, self.logfile, runlogdump, None)
+            execshellcmd_largedump(cmdexc, self.logfile, runlogdump, self.envtoset)
             runlogdump.close()
 
             # Validate if HIP build is successful
@@ -71,5 +70,5 @@ class BuildRunNvidia(BuildRunCommon):
         return True
 
     # Execute test cases
-    def runtest(self, log, testcase):
-        return BuildRunCommon.runtest(self, log, testcase, None)
+    def runtest(self, log, verbosity, testcase):
+        return BuildRunCommon.runtest(self, log, verbosity, testcase, self.envtoset)

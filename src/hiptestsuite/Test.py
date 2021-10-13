@@ -68,6 +68,20 @@ class TestData(AMDObject):
         self.test_result: Union[None, TestResult] = None
 
 
+class ConformanceTestData(AMDObject):
+    def __init__(self):
+        AMDObject.__init__(self)
+        self.CONFORMANCE_VERBOSE = None
+
+    def loadConfig(self):
+        if self.config.CONFORMANCE_VERBOSE == 0:
+            self.CONFORMANCE_VERBOSE = 0
+        elif self.config.CONFORMANCE_VERBOSE == 1:
+            self.CONFORMANCE_VERBOSE = 1
+        else:
+            self.CONFORMANCE_VERBOSE = 0
+
+
 class CompileData(AMDObject):
     def __init__(self):
         AMDObject.__init__(self)
@@ -105,7 +119,6 @@ class HIPCCVerbose(Enum):
     ONE = auto()
     TWO = auto()
     FOUR = auto()
-
 
 class Optimization_Level(Enum):
     ZERO = auto()
@@ -188,16 +201,18 @@ class HIPCCCompileData(CompileData, ConfigProcessor):
         # ToDo offload_target
 
 
-class HIPTestData(TestData, HIPCCCompileData, AllGitData, LogLocation, UserAccess):
+class HIPTestData(TestData, HIPCCCompileData, AllGitData, LogLocation, UserAccess, ConformanceTestData):
     def __init__(self):
         UserAccess.__init__(self)
         LogLocation.__init__(self)
         TestData.__init__(self)
+        ConformanceTestData.__init__(self)
         HIPCCCompileData.__init__(self)
         AllGitData.__init__(self)
 
     def loadConfig(self):
         UserAccess.loadConfig(self)
+        ConformanceTestData.loadConfig(self)
         AllGitData.loadConfig(self)
         HIPCCCompileData.loadConfig(self)
 

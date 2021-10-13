@@ -32,6 +32,9 @@ Optimization_Level = None
 # None/0/1/2/4
 HIPCC_VERBOSE = None
 
+# None/0/1
+CONFORMANCE_VERBOSE = None
+
 # None/cuda directory
 CUDA_PATH = None
 
@@ -74,7 +77,7 @@ repos = {
     "hip": {
         "repo_url": "https://github.com/ROCm-Developer-Tools/HIP",
         "branch": None,
-        "commit_id": "865b40d8bd8b26a7dfe4d9719e8dcf26f4b3afc6"
+        "commit_id": "96ee9d1397f02ac4b4badd9243994728f6a89fe5"
     },
     "mixbench": {
         "repo_url": "https://github.com/ekondis/mixbench.git",
