@@ -32,6 +32,7 @@ class BuildRunAmd(BuildRunCommon):
     '''
     def __init__(self, logfile):
         BuildRunCommon.__init__(self, logfile)
+        self.envtoset = os.environ.copy()
 
     # Build HIP Catch2 for AMD platform
     def build_package(self):
@@ -45,11 +46,11 @@ class BuildRunAmd(BuildRunCommon):
             print("Catch2 test not built. Building Catch2 ..")
             cmd = "cd " + self.hippath + ";"
             cmd += "mkdir build; cd build;"
-            cmd += "cmake -DHIP_PATH=/opt/rocm/hip ../tests/catch;"
+            cmd += "cmake -DHIP_PATH=/opt/rocm/hip -DHIP_PLATFORM=amd ../tests/catch;"
             cmd += "make -j build_tests;"
             cmdexc = cmd
             runlogdump = tempfile.TemporaryFile("w+")
-            execshellcmd_largedump(cmdexc, self.logfile, runlogdump, None)
+            execshellcmd_largedump(cmdexc, self.logfile, runlogdump, self.envtoset)
             runlogdump.close()
 
             # Validate if HIP build is successful
@@ -62,6 +63,6 @@ class BuildRunAmd(BuildRunCommon):
         return True
 
     # Execute test cases
-    def runtest(self, log, testcase):
-        return BuildRunCommon.runtest(self, log, testcase, None)
+    def runtest(self, log, verbosity, testcase):
+        return BuildRunCommon.runtest(self, log, verbosity, testcase, self.envtoset)
 
