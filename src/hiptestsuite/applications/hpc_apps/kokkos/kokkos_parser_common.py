@@ -18,22 +18,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+from hiptestsuite.common.hip_shell import execshellcmd
+import re
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class KokkosParser():
+    def __init__(self, results):
+        self.results = results
 
-
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+    def parse(self, testnum):
+        testpassed = False
+        if testnum == 0:
+            if re.search("100% tests passed, 0 tests failed out of \d+", self.results):
+                testpassed = True
+        elif testnum == 1:
+            if re.search("[\s*PASSED\s*]\s*\d+\s*tests", self.results):
+                testpassed = True
+        return testpassed

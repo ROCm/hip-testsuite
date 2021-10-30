@@ -26,8 +26,8 @@ if __name__ == "__main__":
     sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
 
-from amd.TestersExecutor import TestersExecutor
-from amd.list_tests import list_tests
+from hiptestsuite.TestersExecutor import TestersExecutor
+from hiptestsuite.list_tests import list_tests
 import cfg
 
 
@@ -61,10 +61,13 @@ def parse_args():
 
 
 def main():
+    # Exclude tests from thirdparty folder
+    exclude_module_paths = ["hiptestsuite/thirdparty"]
+
     if parse_args():
         tester_executor: TestersExecutor = TestersExecutor()
         tester_executor.config = cfg
-        tester_executor.executeTests()
+        tester_executor.executeTests(exclude_module_paths=exclude_module_paths)
 
 
 if __name__ == "__main__":

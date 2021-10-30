@@ -18,8 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from amd.TesterRepository import Tester
-from amd.Test import TestResult, TestData, LogLocation, UserAccess
+from hiptestsuite.TesterRepository import Tester
+from hiptestsuite.Test import TestResult, TestData, LogLocation, UserAccess
 
 
 class MyTestData(TestData, LogLocation, UserAccess):

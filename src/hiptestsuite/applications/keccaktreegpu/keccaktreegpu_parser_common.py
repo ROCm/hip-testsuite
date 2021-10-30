@@ -18,22 +18,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+import re
+from hiptestsuite.common.hip_shell import execshellcmd
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class KeccakTreeParser():
+    def __init__(self, results):
+        self.results = results
 
+    def parse(self):
+        passedts1 = False
+        passedts2 = False
+        passedts3 = False
+        passedts4 = False
 
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
+        if re.search("CPU_2stg speed :\s*\d+\.\d+\s*kB/s", self.results):
+            passedts1 = True
+        if re.search("GPU_2stg speed :\s*\d+\.\d+\s*kB/s", self.results):
+            passedts2 = True
+        if re.search("GPU_2stg Stream OverlapCPU speed :\s*\d+\.\d+\s*kB/s", self.results):
+            passedts3 = True
+        if re.search("GPU SCipher speed :\s*\d+\.\d+\s*kB/s", self.results):
+            passedts4 = True
 
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+        return (passedts1 & passedts2 & passedts3 & passedts4)

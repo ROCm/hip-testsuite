@@ -18,22 +18,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+import os
+from hiptestsuite.common.hip_shell import execshellcmd
+from hiptestsuite.applications.hip_samples.hip_samples_build_common import BuildRunCommon
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class BuildRunAmd(BuildRunCommon):
+    def __init__(self, path, logfile):
+        BuildRunCommon.__init__(self, path, logfile)
 
-
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+    def buildtest(self, target):
+        # In this function put the build steps for test cases
+        # which differ across platforms (amd/nvidia/intel) else
+        # invoke BuildRunCommon.buildtest
+        if not os.path.exists("/opt/rocm"):
+            print("ROCm not installed. Exiting!")
+            return False
+        ret = BuildRunCommon.buildtest(self, target)
+        return ret

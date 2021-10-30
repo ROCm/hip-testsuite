@@ -18,22 +18,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+from hiptestsuite.common.hip_shell import execshellcmd
+import re
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class LaghosParser():
+    def __init__(self, results):
+        self.results = results
 
-
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+    def parse(self, testnum):
+        count = 0
+        if testnum == 0 or testnum == 1:
+            if re.search("Major\s*kernels\s*total\s*time\s*\(seconds\):\s*\d+\.\d+", self.results):
+                count = count + 1
+            if re.search("Major\s*kernels\s*total\s*rate\s*\(megadofs\s*x\s*time\s*steps\s*/\s*second\):\s*\d+\.\d+", self.results):
+                count = count + 1
+            if re.search("Energy\s+diff:\s*\d+\.\d+", self.results):
+                count = count + 1
+            if count != 3:
+                return False
+        return True

@@ -20,7 +20,7 @@
 
 version = "1.0.0"
 
-user_password = "AH64_uh1"
+user_password = None
 log_location = None
 
 # None/amd/nvidia
@@ -31,6 +31,9 @@ Optimization_Level = None
 
 # None/0/1/2/4
 HIPCC_VERBOSE = None
+
+# None/0/1
+CONFORMANCE_VERBOSE = None
 
 # None/cuda directory
 CUDA_PATH = None
@@ -74,12 +77,7 @@ repos = {
     "hip": {
         "repo_url": "https://github.com/ROCm-Developer-Tools/HIP",
         "branch": None,
-        "commit_id": "586165ebc281eb9461898a5b2abbc74595f5d97d"
-    },
-    "hipamd": {
-        "repo_url": "https://github.com/ROCm-Developer-Tools/HIPAMD",
-        "branch": None,
-        "commit_id": "de01ce04677243116dba52b59406a130517ea4c7"
+        "commit_id": "96ee9d1397f02ac4b4badd9243994728f6a89fe5"
     },
     "mixbench": {
         "repo_url": "https://github.com/ekondis/mixbench.git",
@@ -91,14 +89,49 @@ repos = {
         "branch": None,
         "commit_id": "6fe81e19556ac26761a1c7247ae29fa88fb4e0ab"
     },
-    "rocclr": {
-        "repo_url": "https://github.com/ROCm-Developer-Tools/ROCclr",
+    "mgbench": {
+        "repo_url": "https://github.com/tbennun/mgbench.git",
         "branch": None,
-        "commit_id": "0ca4f7939969004b9080d814a30cc8e34cdac833"
+        "commit_id": "6f12d3848020af8f718074a30c68e6f0b232bfb3"
     },
-    "opencl": {
-        "repo_url": "https://github.com/RadeonOpenCompute/ROCm-OpenCL-Runtime",
+    "cuda_grep": {
+        "repo_url": "https://github.com/bkase/CUDA-grep.git",
         "branch": None,
-        "commit_id": "bbdc87e08b322d349f82bdd7575c8ce94d31d276"
+        "commit_id": "fa6630eb0c3e782620ec3eaf989873dadc9a036b"
+    },
+    "cuda_memtest": {
+        "repo_url": "https://github.com/ComputationalRadiationPhysics/cuda_memtest.git",
+        "branch": None,
+        "commit_id": "0cd3a996ce82682fcf50fa6f433b6f1f2ce1353d"
+    },
+    "quicksilver": {
+        "repo_url": "https://github.com/LLNL/Quicksilver.git",
+        "branch": "AMD-HIP",
+        "commit_id": "bf073887bf73ef34de8025adaba51c6ad7fb15be"
+    },
+    "gridtools": {
+        "repo_url": "https://github.com/GridTools/gridtools.git",
+        "branch": None,
+        "commit_id": "d33fa6fecee0a7bd9e080212c1038f0dbd31fe97"
+    },
+    "gtbench": {
+        "repo_url": "https://github.com/GridTools/gtbench.git",
+        "branch": None,
+        "commit_id": "42687cce5085e0e175cb02fefe87fbb3d952fd5c"
+    },
+    "kokkos": {
+        "repo_url": "https://github.com/kokkos/kokkos.git",
+        "branch": None,
+        "commit_id": "c28a8b03288b185f846ddfb1b7c08213e12e2634"
+    },
+    "mfem": {
+        "repo_url": "https://github.com/mfem/mfem.git ./mfem",
+        "branch": None,
+        "commit_id": "a3f0a5bb7ca874ec260d6f85afa3693cd6542497"
+    },
+    "Laghos": {
+        "repo_url": "https://github.com/CEED/Laghos.git",
+        "branch": None,
+        "commit_id": "a7f6123d42847f6bdbdb614f5af876541f49cd16"
     }
 }

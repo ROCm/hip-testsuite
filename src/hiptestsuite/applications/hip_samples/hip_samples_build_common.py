@@ -18,22 +18,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+import os
+from hiptestsuite.common.hip_shell import execshellcmd
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class BuildRunCommon():
+    '''
+    In this class insert the build and execution steps for test cases
+    which are identical across different platforms (amd/nvidia/intel).
+    '''
+    def __init__(self, path, logfile):
+        self.thistestpath = path
+        self.logfile = logfile
 
-
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
+    def buildtest(self, target, env = None):
+        cmdcd = "cd " + self.thistestpath + ";"
+        cmd_clean = "make clean;"
+        if target != None:
+            cmd_build = "make " + target + ";"
         else:
-            test_data.test_result = TestResult.FAIL
+            cmd_build = "make;"
+        cmdexc = cmdcd + cmd_clean + cmd_build
+        execshellcmd(cmdexc, self.logfile, env)
+
+    def clean(self):
+        cmdcd = "cd " + self.thistestpath + ";"
+        cmd_clean = "make clean;"
+        cmdexc = cmdcd + cmd_clean
+        execshellcmd(cmdexc, None, None)

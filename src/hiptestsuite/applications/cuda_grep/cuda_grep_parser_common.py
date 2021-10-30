@@ -18,22 +18,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+from hiptestsuite.common.hip_shell import execshellcmd
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class CudaGrepParser():
+    def __init__(self, results):
+        self.results = results
 
-
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+    def parse(self):
+        passed = False
+        count = 0
+        with open(self.results, 'r') as testlog:
+            resulttxt = testlog.read()
+            count = resulttxt.count("All tests passed")
+        if count > 0:
+            passed = True
+        return passed

@@ -18,22 +18,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+from hiptestsuite.common.hip_shell import execshellcmd
+import re
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class GridtoolsParser():
+    def __init__(self, results):
+        self.results = results
+        self.conv_tests = ["HORIZONTAL DIFFUSION", "VERTICAL DIFFUSION", "FULL DIFFUSION",\
+        "HORIZONTAL ADVECTION", "VERTICAL ADVECTION", "RUNGE-KUTTA ADVECTION", "ADVECTION-DIFFUSION"]
+    def parse(self, testnum):
+        test_passed = False
+        if testnum == 0:
+            count = 0
+            for test in self.conv_tests:
+                if re.search(test, self.results):
+                    count = count + 1
+            if count == len(self.conv_tests):
+                test_passed = True
 
+        elif testnum == 1:
+            test1 = False
+            test2 = False
+            if re.search("Median time:\s*\d*\.\d*s", self.results):
+                test1 = True
+            if re.search("Columns per second:\s*\d+", self.results):
+                test2 = True
+            test_passed = test1 & test2
 
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+        return test_passed

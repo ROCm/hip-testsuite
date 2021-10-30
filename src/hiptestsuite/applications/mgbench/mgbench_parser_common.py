@@ -18,22 +18,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+import os
+import re
+from hiptestsuite.common.hip_shell import execshellcmd
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class MgbenchParser():
+    def __init__(self, results):
+        self.results = results
 
-
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
+    def parse(self, test):
+        numgpus = 0
+        gpumatch = re.search("GPUs: *\d+\s", self.results)
+        if gpumatch:
+            gpunum = re.split(":", gpumatch.group(0))
+            numgpus = int(gpunum[1])
         else:
-            test_data.test_result = TestResult.FAIL
+            return False
+
+        result1 = self.results.count("Exchanging between")
+        result2 = self.results.count("Copying from")
+        passed = False
+        if "fullduplex" == test:
+            if numgpus > 1:
+                if result1 > 0:
+                    passed = True
+            else:
+                if result1 == 0:
+                    passed = True
+        else:
+            if result2 > 0:
+                passed = True
+
+        return passed
