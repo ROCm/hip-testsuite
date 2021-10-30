@@ -18,22 +18,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+from hiptestsuite.common.hip_shell import execshellcmd
+import re
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+class QuicksilverParser():
+    def __init__(self, results):
+        self.results = results
 
+    def parse(self):
+        passed1 = False
+        passed2 = False
+        passed3 = False
+        passed4 = False
+        if re.search("PASS:: Absorption / Fission / Scatter Ratios maintained with \d+% tolerance", self.results):
+            passed1 = True
+        if re.search("PASS:: Collision to Facet Crossing Ratio maintained even balanced within \d+% tolerance", self.results):
+            passed2 = True
+        if re.search("PASS:: No Particles Lost During Run", self.results):
+            passed3 = True
+        if re.search("PASS:: Fluence is homogenous across cells with \d+% tolerance", self.results):
+            passed4 = True
 
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
-    def __init__(self):
-        Tester.__init__(self)
-
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+        return (passed1 & passed2 & passed3 & passed4)

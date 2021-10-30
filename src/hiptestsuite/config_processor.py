@@ -18,22 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
-
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+from hiptestsuite.AMD import AMDObject
 
 
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
+class ConfigProcessor(AMDObject):
     def __init__(self):
-        Tester.__init__(self)
+        AMDObject.__init__(self)
+        self.config = None
 
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+    def loadConfig(self):
+        pass

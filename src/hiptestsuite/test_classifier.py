@@ -18,22 +18,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from pathlib import Path
+from hiptestsuite.AMD import AMDObject
 
-from hiptestsuite.TesterRepository import Tester
-from hiptestsuite.Test import TestData, TestResult
+from typing import Union
 
 
-class Test0(Tester):
-    """
-    Simple test case, 
-    Which tests whether rocm is installed
-    """
+class TestClassifier(AMDObject):
     def __init__(self):
-        Tester.__init__(self)
+        self.matched_with_names = dict()
+        AMDObject.__init__(self)
 
-    def test(self, test_data: TestData):
-        if Path("/opt/rocm").exists():
-            test_data.test_result = TestResult.PASS
-        else:
-            test_data.test_result = TestResult.FAIL
+    def add_matched_with_names(self, matched_with_names: Union[None, dict] = None):
+        if matched_with_names is None:
+            matched_with_names = dict()
+        self.matched_with_names.update(matched_with_names)

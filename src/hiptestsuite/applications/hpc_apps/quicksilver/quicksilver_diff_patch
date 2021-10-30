@@ -1,0 +1,46 @@
+diff -Naur ../Quicksilver_orig/src/AtomicMacro.hh src/AtomicMacro.hh
+--- ../Quicksilver_orig/src/AtomicMacro.hh	2021-09-24 16:48:20.970111488 +0530
++++ src/AtomicMacro.hh	2021-09-24 17:09:18.177032332 +0530
+@@ -25,7 +25,7 @@
+ #include <mutex>
+ #include <algorithm>
+ #ifdef HAVE_HIP
+-   #include <hip/hcc_detail/hip_runtime.h>
++   #include <hip/hip_runtime.h>
+ #endif
+ 
+ 
+diff -Naur ../Quicksilver_orig/src/Makefile src/Makefile
+--- ../Quicksilver_orig/src/Makefile	2021-09-24 16:48:20.974111483 +0530
++++ src/Makefile	2021-09-24 17:10:19.804984064 +0530
+@@ -114,20 +114,20 @@
+ #####################################################################################
+ #hip, no MPI
+ #####################################################################################
+-#CXX = $(ROCM_PATH)/bin/hipcc
+-#CXXFLAGS = -I$(ROCM_PATH)/include/
+-#CPPFLAGS = -DHAVE_HIP=1 -DMaxIt=15
+-#LDFLAGS = -L$(ROCM_PATH)/lib -L$(ROCM_PATH)/lib
++CXX = $(ROCM_PATH)/bin/hipcc
++CXXFLAGS = -I$(ROCM_PATH)/include/
++CPPFLAGS = -DHAVE_HIP=1 -DMaxIt=15
++LDFLAGS = -L$(ROCM_PATH)/lib -L$(ROCM_PATH)/lib
+ 
+ ############################################################################
+ #hip + mpi
+ #############################################################################
+-CXX = $(HIP)/bin/hipcc
+-CXXFLAGS1 = -I$(HIP)/include/
+-CXXFLAGS2 = $(CXXFLAGS1) -I$(MPIPATH)/include
+-CXXFLAGS = $(CXXFLAGS2) -pthread
+-CPPFLAGS = -DHAVE_HIP=1 -DHAVE_MPI -DMaxIt=15
+-LDFLAGS = -L$(HIP)/lib -L$(MPIPATH)/lib -lmpi
++#CXX = $(HIP)/bin/hipcc
++#CXXFLAGS1 = -I$(HIP)/include/
++#CXXFLAGS2 = $(CXXFLAGS1) -I$(MPIPATH)/include
++#CXXFLAGS = $(CXXFLAGS2) -pthread
++#CPPFLAGS = -DHAVE_HIP=1 -DHAVE_MPI -DMaxIt=15
++#LDFLAGS = -L$(HIP)/lib -L$(MPIPATH)/lib -lmpi
+ ########################################################################
+ #hip + nvcc
+ ######################################################################
