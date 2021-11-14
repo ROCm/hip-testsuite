@@ -23,19 +23,16 @@ import tempfile
 from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.hpc_apps.gridtools.gridtools_parser_common import GridtoolsParser
 
-class BuildRunAmd():
-    def __init__(self, thistestpath, logFile):
+class BuildRunNvidia():
+    def __init__(self, thistestpath, logFile, cuda_target):
         self.thistestpath = thistestpath
         self.logFile = logFile
         self.runlog = ""
+        self.cuda_target = cuda_target
 
-    def setenv(self, gpu_arch):
-        env = "export HIP_PLATFORM=`/opt/rocm/bin/hipconfig --platform`;"
-        env += "export GT_CUDA_COMPILATION_TYPE=HIPCC-AMDGPU;"
-        env += "export HCC_AMDGPU_TARGET=\""+ gpu_arch +"\";"
-        env += "export ROCMHOME=/opt/rocm;"
-        env += "export PATH=$ROCMHOME/bin:$ROCMHOME/llvm/bin:$ROCMHOME/hip/bin:$ROCMHOME/opencl/bin:$ROCMHOME/rocprofiler/bin:$PATH;"
-        env += "export LD_LIBRARY_PATH=/$ROCMHOME/lib:$ROCMHOME/llvm/lib:$LD_LIBRARY_PATH;"
+    def setenv(self):
+        env = "export HIP_PLATFORM=nvidia; export HIP_COMPILER=nvcc; export HIP_RUNTIME=cuda;"
+        env += "export GT_CUDA_COMPILATION_TYPE=HIPCC-NVCC;"
         env += "export GT_ALL_DIR=$PWD/src/hiptestsuite/applications/hpc_apps/gridtools;"
         env += "export GT_TREE_DIR=$GT_ALL_DIR/GridTools;"
         env += "export BOOST_TREE_DIR=$GT_TREE_DIR/boost_1_72_0;"
@@ -48,16 +45,9 @@ class BuildRunAmd():
         return env
 
     def buildtest(self):
-        # In this function put the build steps for test cases
-        # which differ across platforms (amd/nvidia/intel)
-        # Build Boost
-        gpuarch = get_gpuarch(self.logFile)
-        if gpuarch is None:
-            return False
-
         if not os.path.exists(os.path.join(self.thistestpath, "boost_1_72_0")):
             print("Building and Installing Boost..")
-            cmdexc = self.setenv(gpuarch)
+            cmdexc = self.setenv()
             cmdexc += "cd $GT_TREE_DIR;"
             cmdexc += "tar -xvjf ../boost_1_72_0.tar.bz2;cd $BOOST_TREE_DIR;"
             cmdexc += "./bootstrap.sh --prefix=$BOOST_INSTALL_DIR --with-python=python3;"
@@ -70,11 +60,11 @@ class BuildRunAmd():
         # Build Gridtools
         if not os.path.exists(os.path.join(self.thistestpath, "GridTools/gridtools/build")):
             print("Building and Installing GridTools..")
-            cmdexc = self.setenv(gpuarch)
+            cmdexc = self.setenv()
             cmdexc += "export CXX=/opt/rocm/bin/hipcc;"
             cmdexc += "cd $GT_TREE_DIR;cd $GRIDTOOLS_TREE_DIR;git apply ../../gridtools.patch;mkdir -p $GRIDTOOLS_BUILD_DIR;cd $GRIDTOOLS_BUILD_DIR;"
             cmdexc += "CXX=/opt/rocm/bin/hipcc cmake .. -DBUILD_TESTING=OFF -DBoost_INCLUDE_DIR=$BOOST_INSTALL_DIR/include " +\
-            "-DGT_CUDA_COMPILATION_TYPE=$GT_CUDA_COMPILATION_TYPE -DGT_CUDA_ARCH=" + gpuarch + " " +\
+            "-DGT_CUDA_COMPILATION_TYPE=$GT_CUDA_COMPILATION_TYPE -DGT_CUDA_ARCH=" + self.cuda_target + " " +\
             "-DGT_ENABLE_BACKEND_CUDA=ON -DGT_ENABLE_BACKEND_MC=OFF -DGT_ENABLE_BACKEND_X86=OFF -DGT_ENABLE_BACKEND_NAIVE=OFF " +\
             "-DGT_USE_MPI=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$GRIDTOOLS_INSTALL_DIR;"
             cmdexc += "make -j;"
@@ -88,12 +78,12 @@ class BuildRunAmd():
         # Build Gtbench
         if not os.path.exists(os.path.join(self.thistestpath, "GridTools/gtbench/build")):
             print("Building and Installing Gtbench..")
-            cmdexc = self.setenv(gpuarch)
+            cmdexc = self.setenv()
             cmdexc += "export CXX=/opt/rocm/bin/hipcc;"
             cmdexc += "cd $GT_TREE_DIR;cd $GTBENCH_TREE_DIR;git apply ../../gtbench.patch;mkdir -p $GTBENCH_BUILD_DIR;cd $GTBENCH_BUILD_DIR;"
             cmdexc += "CXX=/opt/rocm/bin/hipcc cmake .. -DGridTools_DIR=$GRIDTOOLS_INSTALL_DIR/lib/cmake -DGTBENCH_BACKEND=cuda " +\
-            "-DGTBENCH_RUNTIME=single_node -DCMAKE_CXX_FLAGS=-D__HIPCC__ -DBoost_INCLUDE_DIR=$BOOST_INSTALL_DIR/include;"
-            cmdexc += "make -j8;"
+            "-DGTBENCH_RUNTIME=single_node -DCMAKE_CXX_FLAGS=--expt-relaxed-constexpr -DBoost_INCLUDE_DIR=$BOOST_INSTALL_DIR/include;"
+            cmdexc += "make CFLAGS=--expt-relaxed-constexpr CXXFLAGS=--expt-relaxed-constexpr -j8;"
             runlogdump = tempfile.TemporaryFile("w+")
             execshellcmd_largedump(cmdexc, self.logFile, runlogdump, None)
             runlogdump.close()

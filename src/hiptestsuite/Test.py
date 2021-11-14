@@ -85,7 +85,8 @@ class ConformanceTestData(AMDObject):
 class CompileData(AMDObject):
     def __init__(self):
         AMDObject.__init__(self)
-        self.build_for_target: Union[None, Set[Target]] = None
+        self.build_for_gfx_target: Union[None, Set[Target]] = None
+        self.build_for_cuda_target: Union[None, Set[Target]] = None
 
 
 class GitData(AMDObject):
@@ -145,7 +146,7 @@ class HIPCCCompileData(CompileData, ConfigProcessor):
         self.CUDA_PATH: Union[None, str] = None
         self.ROCM_PATH: Union[None, str] = None
 
-        # if self.build_for_target, then --offload_arch=
+        # if self.build_for_gfx_target, then --offload_arch=
 
         # -I ./
         self.includes_path: Union[None, List[str]] = None
@@ -193,7 +194,8 @@ class HIPCCCompileData(CompileData, ConfigProcessor):
         self.ROCM_PATH = self.config.ROCM_PATH
         self.CUDA_PATH = self.config.CUDA_PATH
 
-        self.build_for_target = self.config.build_for_target
+        self.build_for_gfx_target = self.config.build_for_gfx_target
+        self.build_for_cuda_target = self.config.build_for_cuda_target
         self.includes_path = self.config.includes_path
         self.link_libs = self.config.link_libs
         self.link_libs_path = self.config.link_libs_path

@@ -23,12 +23,13 @@ import os
 from hiptestsuite.common.hip_shell import execshellcmd_largedump, execshellcmd
 from hiptestsuite.applications.hpc_apps.quicksilver.quicksilver_parser_common import QuicksilverParser
 
-class BuildRunAmd():
-    def __init__(self, thistestpath, logFile):
+class BuildRunNvidia():
+    def __init__(self, thistestpath, logFile, cuda_arch):
         self.thistestpath = thistestpath
         self.logFile = logFile
         self.resultlogFile = None
         self.runlog = ""
+        self.cuda_arch = cuda_arch
 
     def buildtest(self):
         # In this function put the build steps for test cases
@@ -37,10 +38,21 @@ class BuildRunAmd():
         if not os.path.exists("/opt/rocm"):
             print("Rocm backend is not installed under /opt/. Exiting Test!")
             return False
-        env = "export ROCM_PATH=/opt/rocm;"
-        cmdcd = "cd " + self.thistestpath + ";"
-        cmd_build = "cd src; make -j;"
-        cmdexc = env + cmdcd + cmd_build
+        if not os.path.exists("/usr/local/openmpi"):
+            print("Openmpi backend is not installed under /usr/local/. Exiting Test!")
+            return False
+        if not os.path.exists("/usr/local/cuda"):
+            print("Cuda is not installed under /usr/local/. Exiting Test!")
+            return False
+
+        env = "export ROCM_PATH=/opt/rocm;export MPIPATH=/usr/local/openmpi;export CUDA_PATH=/usr/local/cuda;export HIP_PLATFORM=nvidia;"
+        testpath = os.path.join(self.thistestpath, "src/")
+        cmdcd = "cd " + testpath + ";"
+        cmd_modify = ""
+        if not os.path.isfile(os.path.join(testpath, "patched")):
+            cmd_modify = "patch -p0 < ../../qs_diff_patch_nvidia; touch patched;"
+        cmd_build = "CUDA_ARCH=" + self.cuda_arch + " make -j;"
+        cmdexc = env + cmdcd + cmd_modify + cmd_build
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmdexc, self.logFile, runlogdump, None)
         runlogdump.close()

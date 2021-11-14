@@ -24,17 +24,20 @@ import tempfile
 from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.hpc_apps.laghos.laghos_parser_common import LaghosParser
 
-class BuildRunAmd():
-    def __init__(self, thistestpath, logFile):
+class BuildRunNvidia():
+    def __init__(self, thistestpath, logFile, cuda_target):
         self.thistestpath = thistestpath
         self.logFile = logFile
         self.runlog = ""
+        self.cuda_target = cuda_target
 
     def set_env(self):
         cmd = "export MPI_PATH=/usr/local/openmpi;"
         cmd += "export ROCM_PATH=/opt/rocm;"
         cmd += "export PATH=${MPI_PATH}/bin:$PATH;"
         cmd += "export PATH=${ROCM_PATH}/bin:$PATH;"
+        cmd += "export CUDA_PATH=/usr/local/cuda;"
+        cmd += "export HIP_PLATFORM=nvidia;"
         return cmd
 
     def configure_build_hypre(self):
@@ -42,13 +45,6 @@ class BuildRunAmd():
             print("Hypre already built")
             return True
         print("Hypre build in progress ..")
-        if not os.path.exists("/opt/rocm"):
-            print("Rocm backend is not installed under /opt/. Exiting Test!")
-            return False
-        if not os.path.exists("/usr/local/openmpi"):
-            print("Openmpi backend is not installed under /usr/local/. Exiting Test!")
-            return False
-
         cmd = self.set_env()
         cmd += "cd " + self.thistestpath + ";"
         cmd += "wget https://github.com/hypre-space/hypre/archive/v2.16.0.tar.gz;"
@@ -90,10 +86,9 @@ class BuildRunAmd():
         print("Mfem build in progress ..")
         cmd = self.set_env()
         cmd += "cd " + self.thistestpath + "; cd mfem;"
-        cmd += "make config;"
-        cmd += "make phip -j CXXFLAGS=\"-O3 -std=c++11 --gpu-max-threads-per-block=256\" \
-        MFEM_TPLFLAGS=\"-I./../hypre/src/hypre/include -I${MPI_PATH}/include\" MFEM_EXT_LIBS=\"-L./../hypre/src/hypre/lib \
-        -lHYPRE  -L./../metis-4.0 -lmetis  -lrt -L${MPI_PATH}/lib -lmpi\";"
+        if not os.path.isfile(os.path.join(self.thistestpath, "mfem/patched")):
+            cmd += "git apply ../hip_on_nvcc.patch; touch patched;"
+        cmd += "make  phip CXXFLAGS=\"-std=c++11 -x=cu --extended-lambda -arch=" + self.cuda_target + " -O3 -g -I/opt/rocm/include\" MFEM_TPLFLAGS=\"-I./../hypre/src/hypre/include -I${MPI_PATH}/include\" MFEM_EXT_LIBS=\"-L./../hypre/src/hypre/lib -lHYPRE -L./../metis-4.0 -lmetis  -lrt -L${MPI_PATH}/lib -lmpi\" -j;"
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmd, self.logFile, runlogdump, None)
         runlogdump.close()
@@ -109,6 +104,8 @@ class BuildRunAmd():
         print("Laghos build in progress ..")
         cmd = self.set_env()
         cmd += "cd " + self.thistestpath + "; cd Laghos;"
+        if not os.path.isfile(os.path.join(self.thistestpath, "Laghos/patched")):
+            cmd += "git apply ../laghos-multinode.patch; touch patched;"
         cmd += "make -j;"
         runlogdump = tempfile.TemporaryFile("w+")
         execshellcmd_largedump(cmd, self.logFile, runlogdump, None)
@@ -128,6 +125,10 @@ class BuildRunAmd():
             print("Openmpi installed.")
         else:
             print("Openmpi not installed. Exiting test!")
+            return False
+
+        if not os.path.exists("/opt/rocm"):
+            print("Rocm backend is not installed under /opt/. Exiting Test!")
             return False
 
         if not self.configure_build_hypre():

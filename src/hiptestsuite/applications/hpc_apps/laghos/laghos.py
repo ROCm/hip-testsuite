@@ -23,6 +23,7 @@ from hiptestsuite.Test import HIPTestData, TestResult, HIP_PLATFORM
 from typing import Union, List
 from hiptestsuite.test_classifier import TestClassifier
 from hiptestsuite.applications.hpc_apps.laghos.laghos_build_amd import BuildRunAmd
+from hiptestsuite.applications.hpc_apps.laghos.laghos_build_nvidia import BuildRunNvidia
 from hiptestsuite.common.hip_get_packages import HipPackages
 from hiptestsuite.common.hip_shell import execshellcmd
 
@@ -74,9 +75,11 @@ class PrepareTest():
         self.laghos_branch, self.laghos_commitId, "Laghos")
         return ret
 
-    def buildtest(self, logFile, platform):
+    def buildtest(self, logFile, platform, cuda_target):
         if platform == HIP_PLATFORM.amd:
             self.prepareobj = BuildRunAmd(self.thistestpath, logFile)
+        elif platform == HIP_PLATFORM.nvidia:
+            self.prepareobj = BuildRunNvidia(self.thistestpath, logFile, cuda_target)
         else:
             print("Invalid Platform")
             return False
@@ -134,10 +137,6 @@ class LAGHOS_CUBE01_HEX(Tester, PrepareTest):
 
     def test(self, test_data: HIPTestData):
         print("=============== Laghos cube01_hex test ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
-            print("Laghos test is not supported on NVIDIA")
-            test_data.test_result = TestResult.SKIP
-            return
         # Set repo info
         isrepocfgvalid =  self.set_laghos_repoinfo(test_data)
         if not isrepocfgvalid:
@@ -150,7 +149,7 @@ class LAGHOS_CUBE01_HEX(Tester, PrepareTest):
             if not res:
                 test_data.test_result = TestResult.FAIL
                 return
-            res = self.buildtest(testLogger, test_data.HIP_PLATFORM)
+            res = self.buildtest(testLogger, test_data.HIP_PLATFORM, test_data.build_for_cuda_target)
             if not res:
                 test_data.test_result = TestResult.FAIL
                 return
@@ -182,10 +181,6 @@ class LAGHOS_CUBE_12_HEX(Tester, PrepareTest):
 
     def test(self, test_data: HIPTestData):
         print("=============== Laghos cube_12_hex test ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
-            print("Laghos test is not supported on NVIDIA")
-            test_data.test_result = TestResult.SKIP
-            return
         # Set repo info
         isrepocfgvalid =  self.set_laghos_repoinfo(test_data)
         if not isrepocfgvalid:
@@ -198,7 +193,7 @@ class LAGHOS_CUBE_12_HEX(Tester, PrepareTest):
             if not res:
                 test_data.test_result = TestResult.FAIL
                 return
-            res = self.buildtest(testLogger, test_data.HIP_PLATFORM)
+            res = self.buildtest(testLogger, test_data.HIP_PLATFORM, test_data.build_for_cuda_target)
             if not res:
                 test_data.test_result = TestResult.FAIL
                 return
