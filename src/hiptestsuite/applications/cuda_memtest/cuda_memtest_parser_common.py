@@ -18,12 +18,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from hiptestsuite.common.hip_shell import execshellcmd
 import re
 
 class CudaMemtestParser():
     def __init__(self, results):
-        self.results = results
+        results.seek(0)
+        logbytes = results.read()
+        self.results = logbytes
 
     def parse(self):
         passed = False

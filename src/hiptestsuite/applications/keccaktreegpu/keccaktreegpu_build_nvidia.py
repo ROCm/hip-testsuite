@@ -19,14 +19,15 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+import tempfile
+from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.keccaktreegpu.keccaktreegpu_parser_common import KeccakTreeParser
 
 class BuildRunNvidia():
     def __init__(self, thistestpath, logFile, binary):
         self.thistestpath = thistestpath
         self.logFile = logFile
-        self.runlog = ""
+        self.runlog = None
         self.binary = binary
 
     def getenvironmentvariables(self):
@@ -54,13 +55,16 @@ class BuildRunNvidia():
         print("Running keccaktreegpu..")
         env = self.getenvironmentvariables()
         cmdexc = "cd " + self.thistestpath + ";" + "./" + self.binary + ";"
-        self.runlog = execshellcmd(cmdexc, self.logFile, env)
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, self.runlog, env)
 
     def clean(self):
         print("Cleaning keccaktreegpu..")
         cmdcd = "cd " + self.thistestpath + ";"
         cmdclean = "make clean;"
         cmdexc = cmdcd + cmdclean
+        if self.runlog != None:
+            self.runlog.close()
         execshellcmd(cmdexc, None, None)
 
     def parse_result(self):

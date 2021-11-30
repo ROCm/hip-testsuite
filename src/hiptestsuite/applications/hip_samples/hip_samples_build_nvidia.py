@@ -19,7 +19,8 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+import tempfile
+from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.hip_samples.hip_samples_build_common import BuildRunCommon
 
 class BuildRunNvidia(BuildRunCommon):

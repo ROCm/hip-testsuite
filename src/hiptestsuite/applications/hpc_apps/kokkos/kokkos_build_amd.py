@@ -28,7 +28,7 @@ class BuildRunAmd():
     def __init__(self, thistestpath, logFile):
         self.thistestpath = thistestpath
         self.logFile = logFile
-        self.runlog = ""
+        self.runlog = None
 
     def buildtest(self):
         # In this function put the build steps for test cases
@@ -63,10 +63,14 @@ class BuildRunAmd():
         elif testnum == 1:
             cmdrun = "./core/perf_test/KokkosCore_PerfTestExec;"
         cmdexc = cmdcd + cmdrun        
-        self.runlog = execshellcmd(cmdexc, self.logFile, None)
+        env = os.environ.copy()
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, self.runlog, env)
 
     def clean(self):
         print("Cleaning Kokkos..")
+        if self.runlog != None:
+            self.runlog.close()
 
     def parse_result(self, testnum):
         return KokkosParser(self.runlog).parse(testnum)

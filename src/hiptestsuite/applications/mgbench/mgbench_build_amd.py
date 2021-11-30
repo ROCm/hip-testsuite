@@ -19,7 +19,8 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+import tempfile
+from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.mgbench.mgbench_parser_common import MgbenchParser
 
 class BuildRunAmd():
@@ -29,7 +30,7 @@ class BuildRunAmd():
         self.logFile = logFile
         self.mgtestfile = mgtestfile
         self.binary = binary
-        self.runlog = ""
+        self.runlog = None
 
     def buildtest(self):
         # In this function put the build steps for test cases
@@ -61,13 +62,17 @@ class BuildRunAmd():
     def runtest(self):
         print("Running mgbench..")
         cmdexc = "cd " + self.thistestpath + ";" + "./" + self.binary + ";"
-        self.runlog = execshellcmd(cmdexc, self.logFile, None)
+        envtoset = os.environ.copy()
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, self.runlog, envtoset)
 
     def clean(self):
         print("Cleaning mgbench..")
         cmdcd = "cd " + self.thistestpath + ";"
         cmdrm = "rm -f " + self.binary + ";"
         cmdexc = cmdcd + cmdrm
+        if self.runlog != None:
+            self.runlog.close()
         execshellcmd(cmdexc, None, None)
 
     def parse_result(self, test):
