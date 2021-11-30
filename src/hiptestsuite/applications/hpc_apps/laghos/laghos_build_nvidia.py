@@ -28,7 +28,7 @@ class BuildRunNvidia():
     def __init__(self, thistestpath, logFile, cuda_target):
         self.thistestpath = thistestpath
         self.logFile = logFile
-        self.runlog = ""
+        self.runlog = None
         self.cuda_target = cuda_target
 
     def set_env(self):
@@ -155,10 +155,14 @@ class BuildRunNvidia():
             cmd += "mpirun -np 1 laghos -pa -p 1 -tf 0.6 -no-vis -m data/cube01_hex.mesh --cg-tol 0 --cg-max-steps 50 --max-steps 2 -ok 2 -ot 1 -rs 5 -d hip;"
         elif testnum == 1:
             cmd += "mpirun -np 1 laghos -pa -p 1 -tf 0.6 -no-vis -m data/cube_12_hex.mesh --cg-tol 0 --cg-max-steps 50 --max-steps 2 -ok 3 -ot 2 -rs 4 -d hip;"
-        self.runlog = execshellcmd(cmd, self.logFile, None)
+        env = os.environ.copy()
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmd, self.logFile, self.runlog, env)
 
     def clean(self):
         print("Cleaning Laghos..")
+        if self.runlog != None:
+            self.runlog.close()
 
     def parse_result(self, testnum):
         return LaghosParser(self.runlog).parse(testnum)

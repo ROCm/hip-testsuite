@@ -32,7 +32,6 @@ class BuildRunCommon():
     def __init__(self, path):
         self.thistestpath = path
         self.runlogdump = tempfile.TemporaryFile("w+")
-        self.runlog = ""
         self.genbinaryname = None
         self.binarydic = {"vectorAdd":["vectoradd_hip.exe"],\
                      "gpu-burn":["/build/gpuburn-hip"],\
@@ -140,10 +139,7 @@ class BuildRunCommon():
 
         cmdexc = cmdcd + cmd_build
         # Execute the command on shell
-        if "HIP-Examples-Applications" in testid:
-            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
-        else:
-            self.runlog = execshellcmd(cmdexc, logFile, env)
+        execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
         # Check if the test binary/ies is/are generated
         for binary in self.binarydic[testid]:
             if not os.path.isfile(self.thistestpath + binary):
@@ -156,76 +152,109 @@ class BuildRunCommon():
         if testid == "vectorAdd":
             # Test already executed during make
             # Run Parser
-            ret = Hip_examples_parser().vectorAdd(self.runlog)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().vectorAdd(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "gpu-burn":
             cmdexc = "cd " + self.thistestpath + ";" + "." +\
             self.binarydic[testid][0] + " -t 5"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().gpu_burn(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().gpu_burn(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "strided-access":
             cmdexc = "cd " + self.thistestpath + ";" + "./" +\
             self.binarydic[testid][0]
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().strided_access(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().strided_access(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "rtm8":
             cmdexc = "cd " + self.thistestpath + ";" + "./" +\
             self.binarydic[testid][0]
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().rtm8(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().rtm8(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "reduction":
             cmdexc = "cd " + self.thistestpath + ";" +\
             "bash ./run.sh"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().reduction(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().reduction(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "mini-nbody":
             # Test already executed during make
             # Run Parser
-            ret = Hip_examples_parser().mini_nbody(self.runlog)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().mini_nbody(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "add4":
             cmdexc = "cd " + self.thistestpath + ";" +\
             "./runhip.sh"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().add4(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().add4(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "cuda-stream":
             cmdexc = "cd " + self.thistestpath + ";" + "./" +\
             self.binarydic[testid][0]
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().cuda_stream(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().cuda_stream(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "openmp-helloworld":
             # Test already executed during make
             # Run Parser
-            ret = Hip_examples_parser().openmp_helloworld(self.runlog)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().openmp_helloworld(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "rodinia_3.bfs" or testid == "rodinia_3.cfd" or \
         testid == "rodinia_3.dwt2d" or testid == "rodinia_3.particlefilter":
             cmdexc = "cd " + self.thistestpath + ";" + "make test;"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().rodina3(self.runlog, "PASSED", 2)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().rodina3(logbytes, "PASSED", 2)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "rodinia_3.gaussian" or testid == "rodinia_3.lavaMD":
             cmdexc = "cd " + self.thistestpath + ";" + "make test;"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().rodina3(self.runlog, "PASSED", 5)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().rodina3(logbytes, "PASSED", 5)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "rodinia_3.heartwall" or testid == "rodinia_3.hotspot"\
         or testid == "rodinia_3.hybridsort" or testid == "rodinia_3.lud"\
         or testid == "rodinia_3.myocyte" or testid == "rodinia_3.nn"\
@@ -233,16 +262,22 @@ class BuildRunCommon():
         or testid == "rodinia_3.srad" or testid == "rodinia_3.streamcluster"\
         or testid == "rodinia_3.b+tree" or testid == "rodinia_3.backprop":
             cmdexc = "cd " + self.thistestpath + ";" + "make test;"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().rodina3(self.runlog, "PASSED", 1)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().rodina3(logbytes, "PASSED", 1)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "rodinia_3.kmeans":
             cmdexc = "cd " + self.thistestpath + ";" + "make test;"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().rodina3(self.runlog, "PASSED", 4)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().rodina3(logbytes, "PASSED", 4)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "HIP-Examples-Applications.BinomialOption" or\
         testid == "HIP-Examples-Applications.BitonicSort" or\
         testid == "HIP-Examples-Applications.dct" or\
@@ -263,32 +298,43 @@ class BuildRunCommon():
         elif testid == "GPU-STREAM-DOUBLE":
             cmdexc = "cd " + self.thistestpath + ";" +\
             "./hip-stream"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().gpu_stream(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().gpu_stream(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "GPU-STREAM-FLOAT":
             cmdexc = "cd " + self.thistestpath + ";" +\
             "./hip-stream --float"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().gpu_stream(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().gpu_stream(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "mixbench-hip-alt":
             cmdexc = "cd " + self.thistestpath + ";" +\
             "./mixbench-hip-alt"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().mix_bench(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().mix_bench(logbytes)
             if ret == "Failed":
                 res &= False
+            self.runlogdump.close()
         elif testid == "mixbench-hip-ro":
             cmdexc = "cd " + self.thistestpath + ";" +\
             "./mixbench-hip-ro"
-            self.runlog = execshellcmd(cmdexc, logFile, env)
-            ret = Hip_examples_parser().mix_bench(self.runlog)
+            execshellcmd_largedump(cmdexc, logFile, self.runlogdump, env)
+            self.runlogdump.seek(0)
+            logbytes = self.runlogdump.read()
+            ret = Hip_examples_parser().mix_bench(logbytes)
             if ret == "Failed":
                 res &= False
-
+            self.runlogdump.close()
         return res
 
     def clean(self, testid):

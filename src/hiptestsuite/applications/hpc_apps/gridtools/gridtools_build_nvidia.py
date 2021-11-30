@@ -27,7 +27,7 @@ class BuildRunNvidia():
     def __init__(self, thistestpath, logFile, cuda_target):
         self.thistestpath = thistestpath
         self.logFile = logFile
-        self.runlog = ""
+        self.runlog = None
         self.cuda_target = cuda_target
 
     def setenv(self):
@@ -101,10 +101,14 @@ class BuildRunNvidia():
             print("Testing Performance Test")
             cmdrun = "./benchmark --domain-size 256 256 --runs 100;"
         cmdexc = cmdcd + cmdrun
-        self.runlog = execshellcmd(cmdexc, self.logFile, None)
+        env = os.environ.copy()
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, self.runlog, env)
 
     def clean(self):
         print("Cleaning Gridtools..")
+        if self.runlog != None:
+            self.runlog.close()
 
     def parse_result(self, testnum):
         return GridtoolsParser(self.runlog).parse(testnum)

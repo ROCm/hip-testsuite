@@ -19,14 +19,15 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+import tempfile
+from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.cuda_memtest.cuda_memtest_parser_common import CudaMemtestParser
 
 class BuildRunNvidia():
     def __init__(self, thistestpath, logFile, binary):
         self.thistestpath = thistestpath
         self.logFile = logFile
-        self.runlog = ""
+        self.runlog = None
         self.binary = binary
 
     def getenvironmentvariables(self):
@@ -49,7 +50,7 @@ class BuildRunNvidia():
         cmd_modify = ""
         if not os.path.isfile(os.path.join(self.thistestpath, "hipified")):
             cmd_hipify = "ls cuda_memtest.* misc.* tests.cu | xargs -t -I % sh -c '/opt/rocm/bin/hipify-perl % > hip_%; rm %; mv hip_% %;';"
-            cmd_modify = "patch -p0 < ../cuda_memtest_patch; touch hipified;"
+            cmd_modify = "cp ../cuda_memtest.cu .;"
         cmd_build = "/opt/rocm/bin/hipcc -DENABLE_NVML=0 cuda_memtest.cu misc.cpp tests.cu -o " + self.binary + ";"
         cmdexc = cmdcd + cmd_hipify + cmd_modify + cmd_build
         execshellcmd(cmdexc, self.logFile, env)
@@ -61,13 +62,16 @@ class BuildRunNvidia():
         cmdcd = "cd " + self.thistestpath + ";"
         cmdrun = "./" + self.binary + " --disable_all --enable_test " + str(testnum) + " --num_passes 1"
         cmdexc = cmdcd + cmdrun
-        self.runlog = execshellcmd(cmdexc, self.logFile, env)
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, self.runlog, env)
 
     def clean(self):
         print("Cleaning cuda_memtest..")
         cmdcd = "cd " + self.thistestpath + ";"
         cmdrm = "rm -f " + self.binary + ";"
         cmdexc = cmdcd + cmdrm
+        if self.runlog != None:
+            self.runlog.close()
         execshellcmd(cmdexc, None, None)
 
     def parse_result(self):

@@ -23,7 +23,9 @@ from hiptestsuite.common.hip_shell import execshellcmd
 
 class KeccakTreeParser():
     def __init__(self, results):
-        self.results = results
+        results.seek(0)
+        logbytes = results.read()
+        self.results = logbytes
 
     def parse(self):
         passedts1 = False
