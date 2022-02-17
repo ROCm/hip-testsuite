@@ -23,6 +23,7 @@ from hiptestsuite.Test import HIPTestData, TestResult, HIP_PLATFORM
 from typing import Union, List
 from hiptestsuite.test_classifier import TestClassifier
 from hiptestsuite.applications.hpc_apps.quicksilver.quicksilver_build_amd import BuildRunAmd
+from hiptestsuite.applications.hpc_apps.quicksilver.quicksilver_build_nvidia import BuildRunNvidia
 from hiptestsuite.common.hip_get_packages import HipPackages
 from hiptestsuite.common.hip_shell import execshellcmd
 
@@ -60,13 +61,16 @@ class PrepareTest():
         self.appbranch, self.appcommitId, "quicksilver")
         return ret
 
-    def buildtest(self, logFile, platform):
+    def buildtest(self, logFile, platform, cuda_target):
         isBinaryPresent = True
         if platform == HIP_PLATFORM.amd:
             self.prepareobj = BuildRunAmd(self.thistestpath, logFile)
+        elif platform == HIP_PLATFORM.nvidia:
+            self.prepareobj = BuildRunNvidia(self.thistestpath, logFile, cuda_target)
         else:
             print("Invalid Platform")
             return False
+
         buildstatus = self.prepareobj.buildtest()
         if buildstatus == False:
             return False
@@ -126,10 +130,6 @@ class QUICKSILVERTEST(Tester, PrepareTest):
 
     def test(self, test_data: HIPTestData):
         print("=============== Quicksilver test ===============")
-        if test_data.HIP_PLATFORM == HIP_PLATFORM.nvidia:
-            print("Quicksilver test is not supported on NVIDIA")
-            test_data.test_result = TestResult.SKIP
-            return
         # Set repo info
         isrepocfgvalid =  self.set_quicksilver_repoinfo(test_data)
         if not isrepocfgvalid:
@@ -142,7 +142,7 @@ class QUICKSILVERTEST(Tester, PrepareTest):
             if not res:
                 test_data.test_result = TestResult.FAIL
                 return
-            res = self.buildtest(testLogger, test_data.HIP_PLATFORM)
+            res = self.buildtest(testLogger, test_data.HIP_PLATFORM, test_data.build_for_cuda_target)
             if not res:
                 test_data.test_result = TestResult.FAIL
                 return

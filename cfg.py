@@ -42,7 +42,8 @@ CUDA_PATH = None
 ROCM_PATH = None
 
 # None/offload target
-build_for_target = None
+build_for_gfx_target = None
+build_for_cuda_target = "compute_70"
 
 # -I.
 # None/List of paths
@@ -107,11 +108,11 @@ repos = {
     "quicksilver": {
         "repo_url": "https://github.com/LLNL/Quicksilver.git",
         "branch": "AMD-HIP",
-        "commit_id": "bf073887bf73ef34de8025adaba51c6ad7fb15be"
+        "commit_id": "3eddfc36003de27ee404499923b18e04efef8dad"
     },
     "gridtools": {
         "repo_url": "https://github.com/GridTools/gridtools.git",
-        "branch": None,
+        "branch": "v1.1.3",
         "commit_id": "d33fa6fecee0a7bd9e080212c1038f0dbd31fe97"
     },
     "gtbench": {
@@ -126,8 +127,8 @@ repos = {
     },
     "mfem": {
         "repo_url": "https://github.com/mfem/mfem.git ./mfem",
-        "branch": None,
-        "commit_id": "a3f0a5bb7ca874ec260d6f85afa3693cd6542497"
+        "branch": "amd",
+        "commit_id": "1ded8554ea470e2018284a881594b888b938ed0b"
     },
     "Laghos": {
         "repo_url": "https://github.com/CEED/Laghos.git",

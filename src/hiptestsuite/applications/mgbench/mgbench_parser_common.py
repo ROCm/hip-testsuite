@@ -20,11 +20,12 @@
 
 import os
 import re
-from hiptestsuite.common.hip_shell import execshellcmd
 
 class MgbenchParser():
     def __init__(self, results):
-        self.results = results
+        results.seek(0)
+        logbytes = results.read()
+        self.results = logbytes
 
     def parse(self, test):
         numgpus = 0

@@ -19,7 +19,8 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+import tempfile 
+from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.cuda_grep.cuda_grep_parser_common import CudaGrepParser
 
 class BuildRunNvidia():
@@ -61,7 +62,10 @@ class BuildRunNvidia():
         print("Running cuda_grep..")
         env = self.getenvironmentvariables()
         cmdexc = "cd " + self.runpath + ";" + "./runtests.sh;"
-        execshellcmd(cmdexc, self.logFile, env)
+        runlogdump = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, runlogdump, env)
+        runlogdump.close()
+
 
     def clean(self):
         print("Cleaning cuda_grep..")

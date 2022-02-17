@@ -19,7 +19,8 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+import tempfile
+from hiptestsuite.common.hip_shell import *
 from hiptestsuite.applications.mgbench.mgbench_parser_common import MgbenchParser
 
 class BuildRunNvidia():
@@ -29,7 +30,7 @@ class BuildRunNvidia():
         self.logFile = logFile
         self.mgtestfile = mgtestfile
         self.binary = binary
-        self.runlog = ""
+        self.runlog = None
 
     def getenvironmentvariables(self):
         envtoset = os.environ.copy()
@@ -69,13 +70,16 @@ class BuildRunNvidia():
         print("Running mgbench..")
         env = self.getenvironmentvariables()
         cmdexc = "cd " + self.thistestpath + ";" + "./" + self.binary + ";"
-        self.runlog = execshellcmd(cmdexc, self.logFile, env)
+        self.runlog = tempfile.TemporaryFile("w+")
+        execshellcmd_largedump(cmdexc, self.logFile, self.runlog, env)
 
     def clean(self):
         print("Cleaning mgbench..")
         cmdcd = "cd " + self.thistestpath + ";"
         cmdrm = "rm -f " + self.binary + ";"
         cmdexc = cmdcd + cmdrm
+        if self.runlog != None:
+            self.runlog.close()
         execshellcmd(cmdexc, None, None)
 
     def parse_result(self, test):

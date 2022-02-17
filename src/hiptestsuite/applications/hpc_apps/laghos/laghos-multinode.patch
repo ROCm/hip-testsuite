@@ -1,0 +1,27 @@
+diff --git a/laghos.cpp b/laghos.cpp
+index cfcb0ed..bee1447 100644
+--- a/laghos.cpp
++++ b/laghos.cpp
+@@ -201,6 +201,7 @@ int main(int argc, char *argv[])
+    if (mpi.Root()) { args.PrintOptions(cout); }
+ 
+    // Configure the device from the command line options
++   dev=myid;
+    Device backend;
+    backend.Configure(device, dev);
+    if (mpi.Root()) { backend.Print(); }
+diff --git a/laghos_solver.cpp b/laghos_solver.cpp
+index 2a04477..255ce57 100644
+--- a/laghos_solver.cpp
++++ b/laghos_solver.cpp
+@@ -689,6 +689,10 @@ void LagrangianHydroOperator::PrintTimingData(bool IamRoot, int steps,
+       cout << "Major kernels total time (seconds): " << T[4] << endl;
+       cout << "Major kernels total rate (megadofs x time steps / second): "
+            << FOM << endl;
++      cout <<" "<< endl;
++            cout <<" FOM= "<<T[2]*FOM2/T[4] << endl;
++
++
+       if (!fom) { return; }
+       const int QPT = ir.GetNPoints();
+       const HYPRE_Int GNZones = alldata[2];

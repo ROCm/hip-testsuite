@@ -1,0 +1,44 @@
+diff --git a/general/error.hpp b/general/error.hpp
+index 957aef944..a59cee0a3 100644
+--- a/general/error.hpp
++++ b/general/error.hpp
+@@ -150,16 +150,20 @@ void mfem_warning(const char *msg = NULL);
+ 
+ // Additional abort functions for HIP
+ #if defined(MFEM_USE_HIP)
+-template<typename T>
+-__host__ void abort_msg(T & msg)
+-{
+-   MFEM_ABORT(msg);
+-}
++//template<typename T>
++//__host__ void abort_msg(T & msg)
++//{
++//   MFEM_ABORT(msg);
++//}
+ 
+ template<typename T>
+-__device__ void abort_msg(T & msg)
++__host__ __device__ void abort_msg(T & msg)
+ {
++#ifndef __HIP_DEVICE_COMPILE_
++   MFEM_ABORT(msg);
++#else
+    abort();
++#endif
+ }
+ #endif
+ 
+diff --git a/general/hip.hpp b/general/hip.hpp
+index 9ad804fff..62d8ed625 100644
+--- a/general/hip.hpp
++++ b/general/hip.hpp
+@@ -20,7 +20,7 @@
+ 
+ #ifdef MFEM_USE_HIP
+ #define MFEM_DEVICE __device__
+-#define MFEM_LAMBDA __host__ __device__
++#define MFEM_LAMBDA __host__ 
+ #define MFEM_HOST_DEVICE __host__ __device__
+ #define MFEM_DEVICE_SYNC MFEM_GPU_CHECK(hipDeviceSynchronize())
+ #define MFEM_STREAM_SYNC MFEM_GPU_CHECK(hipStreamSynchronize(0))
