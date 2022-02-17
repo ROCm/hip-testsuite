@@ -41,7 +41,8 @@ class BuildRunAmd(BuildRunCommon):
         # In this function put the execution steps for test cases
         # which differ across platforms (amd/nvidia/intel) else
         # invoke BuildRunCommon.buildtest
-        ret = BuildRunCommon.runtest(self, logFile, testid)
+        envtoset = os.environ.copy()
+        ret = BuildRunCommon.runtest(self, logFile, testid, envtoset)
         return ret
 
     # Clean all generated binaries

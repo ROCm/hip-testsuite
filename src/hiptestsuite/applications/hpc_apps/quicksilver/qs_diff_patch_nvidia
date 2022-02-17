@@ -1,0 +1,32 @@
+--- ../../Makefile	2021-11-12 16:14:28.748243195 +0530
++++ Makefile	2021-11-12 16:19:31.194839331 +0530
+@@ -119,10 +119,10 @@
+ #####################################################################################
+ #hip, no MPI
+ #####################################################################################
+-CXX = $(ROCM_PATH)/bin/hipcc
+-CXXFLAGS = -I$(ROCM_PATH)/include/
+-CPPFLAGS = -DHAVE_HIP=1 -DMaxIt=15
+-LDFLAGS = -L$(ROCM_PATH)/lib -L$(ROCM_PATH)/lib
++#CXX = $(ROCM_PATH)/bin/hipcc
++#CXXFLAGS = -I$(ROCM_PATH)/include/
++#CPPFLAGS = -DHAVE_HIP=1 -DMaxIt=15
++#LDFLAGS = -L$(ROCM_PATH)/lib -L$(ROCM_PATH)/lib
+ 
+ ############################################################################
+ #hip + mpi
+@@ -137,10 +137,10 @@
+ #hip + nvcc
+ ######################################################################
+ ###export HIP_PLATFORM=nvidia
+-#CXX = $(ROCM_PATH)/bin/hipcc
+-#CXXFLAGS = -I$(ROCM_PATH)/include/ -I$(CUDA_PATH)/include -I${MPIPATH}/include
+-#CPPFLAGS = -DHAVE_HIP=1 -DHAVE_MPI -DHAVE_ASYNC_MPI -DMaxIt=15 -DHAVE_CUDA=1 -arch=compute_80
+-#LDFLAGS = -L$(CUDA_PATH)/lib64 -lcuda -lcudart -L${MPIPATH}/lib -lmpi
++CXX = $(ROCM_PATH)/bin/hipcc
++CXXFLAGS = -I$(ROCM_PATH)/include/ -I$(CUDA_PATH)/include -I${MPIPATH}/include
++CPPFLAGS = -DHAVE_HIP=1 -DHAVE_MPI -DHAVE_ASYNC_MPI -DMaxIt=15 -DHAVE_CUDA=1 -arch=$(CUDA_ARCH)
++LDFLAGS = -L$(CUDA_PATH)/lib64 -lcuda -lcudart -L${MPIPATH}/lib -lmpi
+ 
+ ###############################################################################
+ #hip openmp 4.5 not supported yet

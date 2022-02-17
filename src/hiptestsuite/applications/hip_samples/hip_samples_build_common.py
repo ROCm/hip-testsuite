@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 import os
-from hiptestsuite.common.hip_shell import execshellcmd
+from hiptestsuite.common.hip_shell import *
 
 class BuildRunCommon():
     '''

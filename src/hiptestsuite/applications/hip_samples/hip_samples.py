@@ -25,8 +25,8 @@ from hiptestsuite.test_classifier import TestClassifier
 from hiptestsuite.applications.hip_samples.hip_samples_build_amd import BuildRunAmd
 from hiptestsuite.applications.hip_samples.hip_samples_build_nvidia import BuildRunNvidia
 from hiptestsuite.common.hip_get_packages import HipPackages
-from hiptestsuite.common.hip_shell import execshellcmd
-
+from hiptestsuite.common.hip_shell import *
+import tempfile
 import os
 import re
 # Common class to clone, set up, build and run test
@@ -37,7 +37,7 @@ class PrepareTest():
         self.hippath = os.path.join(self.conformancePath, "HIP/")
         self.thistestpath = os.path.join(self.hippath, path)
         self.binary = binary
-        self.testExecOutput = ""
+        self.testExecOutput = None
         self.hiprepo = "" # Default
         self.hipbranch = ""
         self.hipcommitId = ""
@@ -83,8 +83,14 @@ class PrepareTest():
 
     def runtest(self, logFile):
         cmdexc = "cd " + self.thistestpath + ";" + "./" + self.binary
-        self.testExecOutput += execshellcmd(cmdexc, logFile, None)
-
+        if os.environ.get('AMD_LOG_LEVEL') is None:
+            self.testExecOutput = execshellcmd(cmdexc, logFile, None)
+        else:
+            runlogdump = tempfile.TemporaryFile("w+")
+            envtoset = os.environ.copy()
+            execshellcmd_largedump(cmdexc, logFile, runlogdump, envtoset)
+            runlogdump.seek(0)
+            self.testExecOutput = runlogdump.read()
 
 # Common class to parse the result of test execution
 class LogParser():

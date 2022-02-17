@@ -18,12 +18,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-from hiptestsuite.common.hip_shell import execshellcmd
 import re
 
 class QuicksilverParser():
     def __init__(self, results):
-        self.results = results
+        results.seek(0)
+        self.results = results.read()
 
     def parse(self):
         passed1 = False

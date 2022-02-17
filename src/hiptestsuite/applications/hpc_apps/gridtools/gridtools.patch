@@ -1,0 +1,22 @@
+diff --git a/cmake/definitions.cmake b/cmake/definitions.cmake
+index 8c49b56d..cd3743bd 100644
+--- a/cmake/definitions.cmake
++++ b/cmake/definitions.cmake
+@@ -61,6 +61,17 @@ if(CUDA_AVAILABLE)
+     elseif(GT_CUDA_COMPILATION_TYPE MATCHES "HIPCC-AMDGPU")
+         set(hipcc_options_ -xhip --amdgpu-target=${GT_CUDA_ARCH})
+         target_compile_options(gridtools INTERFACE $<$<COMPILE_LANGUAGE:CXX>:${hipcc_options_}>)
++        target_compile_definitions(gridtools INTERFACE GT_USE_HIP)
++    elseif(GT_CUDA_COMPILATION_TYPE MATCHES "HIPCC-NVCC")
++
++        # allow to call constexpr __host__ from constexpr __device__, e.g. call std::max in constexpr context
++        target_compile_options(gridtools INTERFACE
++            $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr>)
++
++        if(${GT_CXX_STANDARD} STREQUAL "c++17")
++            message(FATAL_ERROR "c++17 is not supported for CUDA compilation")
++        endif()
++
+         target_compile_definitions(gridtools INTERFACE GT_USE_HIP)
+     endif()
+ 
