@@ -33,7 +33,7 @@ import cfg
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--platform', help="On which hip_platform to test? amd/nvidia/ default:amd")
+    parser.add_argument('--platform', help="On which hip_platform to test? amd/nvidia/spirv default:amd")
     parser.add_argument('-t', '--tests', nargs='+',
         # required=True,
         # choices=TESTS_CHOICES,

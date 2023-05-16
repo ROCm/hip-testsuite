@@ -134,5 +134,10 @@ repos = {
         "repo_url": "https://github.com/CEED/Laghos.git",
         "branch": None,
         "commit_id": "a7f6123d42847f6bdbdb614f5af876541f49cd16"
-    }
+    },
+    "libCEED": {
+        "repo_url": "https://github.com/franz/libCEED.git",
+        "branch": None, # chip_spv_fixes
+        "commit_id": "3999238a49747d46fffdbfbfec005a5e0bcf9e76"
+    },
 }
