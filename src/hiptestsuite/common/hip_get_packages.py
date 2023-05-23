@@ -63,6 +63,8 @@ class HipPackages():
         self.mfemapppath = os.path.join(self.mfemrootpath, "mfem/")
         self.laghosrootpath = os.path.join(self.cwdAbs, "src/hiptestsuite/applications/hpc_apps/laghos/")
         self.laghosapppath = os.path.join(self.laghosrootpath, "Laghos/")
+        self.adeptrootpath = os.path.join(self.cwdAbs, "src/hiptestsuite/applications/hpc_apps/adept/")
+        self.adeptapppath = os.path.join(self.adeptrootpath, "ADEPT/")
 
     def pull_repo(self, logFile, repo, branch, commitId, reponame):
         repo_root_path = ""
@@ -132,6 +134,10 @@ class HipPackages():
             repo_root_path = self.laghosapppath
             repo_location = self.laghosrootpath
             repo_dir = "Laghos"
+        elif reponame == "ADEPT":
+            repo_root_path = self.adeptapppath
+            repo_location = self.adeptrootpath
+            repo_dir = reponame
 
         if  os.path.isdir(repo_root_path) and os.path.isdir(repo_root_path + "/.git"):
             print(reponame + " already exist")
