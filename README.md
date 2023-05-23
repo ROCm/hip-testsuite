@@ -31,6 +31,12 @@ $ cd hip-testsuite
 $ pip3 install -r requirements.txt
 ```
 
+•	Required packages for some tests on Ubuntu
+```
+$ sudo apt install autoconf autogen automake autotools-dev bzip2 g++ gcc \
+gfortran libtool libtool-bin make patch pkg-config zlib1g-dev
+```
+
 •	Verify "cfg.py" contents to make sure that desired values are present
 To provide input configurations like log location, platform, repos etc. "cfg.py" is used.  Please check 6.3.1 for further details.
 
