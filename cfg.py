@@ -139,5 +139,10 @@ repos = {
         "repo_url": "https://github.com/mgawan/ADEPT.git",
         "branch": "hip",
         "commit_id": "824165fba3073399130455dec943405fe983cab5"
+    },
+    "LocalAsmHashTbl": {
+        "repo_url": "https://github.com/mgawan/gpu_local_ht.git",
+        "branch": "hip",
+        "commit_id": "5bf9b6052fb63f7509797b48860818c0702df7e1"
     }
 }

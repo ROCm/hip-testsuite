@@ -65,6 +65,11 @@ class HipPackages():
         self.laghosapppath = os.path.join(self.laghosrootpath, "Laghos/")
         self.adeptrootpath = os.path.join(self.cwdAbs, "src/hiptestsuite/applications/hpc_apps/adept/")
         self.adeptapppath = os.path.join(self.adeptrootpath, "ADEPT/")
+        self.localasmhashtblrootpath = os.path.join(
+            self.cwdAbs, "src/hiptestsuite/applications/hpc_apps/",
+            "LocalAssemblyHashTable/")
+        self.localasmhashtblapppath = os.path.join(
+            self.localasmhashtblrootpath, "gpu_local_ht/")
 
     def pull_repo(self, logFile, repo, branch, commitId, reponame):
         repo_root_path = ""
@@ -138,6 +143,10 @@ class HipPackages():
             repo_root_path = self.adeptapppath
             repo_location = self.adeptrootpath
             repo_dir = reponame
+        elif reponame == "LocalAsmHashTbl":
+            repo_root_path = self.localasmhashtblapppath
+            repo_location = self.localasmhashtblrootpath
+            repo_dir = "gpu_local_ht"
 
         if  os.path.isdir(repo_root_path) and os.path.isdir(repo_root_path + "/.git"):
             print(reponame + " already exist")
