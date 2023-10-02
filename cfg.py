@@ -134,5 +134,15 @@ repos = {
         "repo_url": "https://github.com/CEED/Laghos.git",
         "branch": None,
         "commit_id": "a7f6123d42847f6bdbdb614f5af876541f49cd16"
+    },
+    "ADEPT": {
+        "repo_url": "https://github.com/mgawan/ADEPT.git",
+        "branch": "hip",
+        "commit_id": "824165fba3073399130455dec943405fe983cab5"
+    },
+    "LocalAsmHashTbl": {
+        "repo_url": "https://github.com/mgawan/gpu_local_ht.git",
+        "branch": "hip",
+        "commit_id": "5bf9b6052fb63f7509797b48860818c0702df7e1"
     }
 }

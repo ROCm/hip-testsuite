@@ -42,6 +42,7 @@ def execshellcmd_largedump(cmdexc, logfile, runlog, myenv):
         for line in runlog:
             logfile.write(line)
     runlog.seek(0)
+    return proc.returncode
 
 def get_gpuarch(logFile):
     # Get GPU Architecture
