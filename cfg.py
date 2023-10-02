@@ -134,5 +134,10 @@ repos = {
         "repo_url": "https://github.com/CEED/Laghos.git",
         "branch": None,
         "commit_id": "a7f6123d42847f6bdbdb614f5af876541f49cd16"
-    }
+    },
+    "libCEED": {
+        "repo_url": "https://github.com/CEED/libCEED.git",
+        "branch": "main",
+        "commit_id": "83ae4962eb1665164b53413c90f83e857c5b69b9"
+    },
 }

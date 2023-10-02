@@ -63,6 +63,10 @@ class HipPackages():
         self.mfemapppath = os.path.join(self.mfemrootpath, "mfem/")
         self.laghosrootpath = os.path.join(self.cwdAbs, "src/hiptestsuite/applications/hpc_apps/laghos/")
         self.laghosapppath = os.path.join(self.laghosrootpath, "Laghos/")
+        # libCEED
+        self.libceedrootpath = os.path.join(self.cwdAbs, "src/hiptestsuite/applications/hpc_apps/libceed/")
+        self.libceedapppath = os.path.join(self.libceedrootpath, "libCEED/")
+
 
     def pull_repo(self, logFile, repo, branch, commitId, reponame):
         repo_root_path = ""
@@ -132,6 +136,13 @@ class HipPackages():
             repo_root_path = self.laghosapppath
             repo_location = self.laghosrootpath
             repo_dir = "Laghos"
+        elif reponame == "libCEED":
+            repo_root_path = self.libceedapppath
+            repo_location = self.libceedrootpath
+            repo_dir = "libCEED"
+        else:
+            print("repository: " + reponame + " does not exist in hip_get_packages.py")
+            return False
 
         if  os.path.isdir(repo_root_path) and os.path.isdir(repo_root_path + "/.git"):
             print(reponame + " already exist")
@@ -149,8 +160,6 @@ class HipPackages():
             ((commitId == "") or (commitId in currentcommitid)):
                 print("This repo is up to date with config")
                 return True
-        else:
-            print(reponame + " does not exist")
 
         # Update the repo
         print("Updating: " + reponame)
